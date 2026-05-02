@@ -17,16 +17,16 @@ body{
   position:relative;
 }
 
-/* 🌟 static golden sparkle background (VERY subtle) */
+/* ✨ cinematic glow field */
 body::before{
   content:"";
   position:absolute;
   width:100%;
   height:100%;
   background:
-    radial-gradient(circle at 20% 30%, rgba(255,215,0,0.05) 0%, transparent 40%),
-    radial-gradient(circle at 70% 60%, rgba(196,154,60,0.04) 0%, transparent 45%),
-    radial-gradient(circle at 40% 80%, rgba(255,215,0,0.03) 0%, transparent 50%);
+    radial-gradient(circle at 20% 30%, rgba(255,215,0,0.06), transparent 40%),
+    radial-gradient(circle at 70% 60%, rgba(196,154,60,0.05), transparent 45%),
+    radial-gradient(circle at 40% 80%, rgba(255,209,0,0.04), transparent 50%);
   pointer-events:none;
 }
 
@@ -36,7 +36,6 @@ body::before{
   width:100%;
   height:100%;
   background:radial-gradient(circle at center, transparent 60%, rgba(0,0,0,0.92));
-  pointer-events:none;
 }
 
 /* container */
@@ -49,14 +48,14 @@ body::before{
 .logo{
   font-size:3.6rem;
   letter-spacing:0.75em;
-  margin-bottom:1.5rem;
+  margin-bottom:1.2rem;
   background:linear-gradient(120deg,#C49A3C,#FFD700,#FFF2B0,#C49A3C);
   color:transparent;
   -webkit-background-clip:text;
   background-clip:text;
 }
 
-/* 🇨🇩 flag line (SUBTLE flowing gradient, no movement) */
+/* 🇨🇩 flag beam (subtle but alive via gradient depth, not animation) */
 .flag{
   width:380px;
   height:6px;
@@ -64,16 +63,24 @@ body::before{
   transform:skewX(-25deg);
   background:linear-gradient(
     90deg,
-    rgba(0,163,224,0.9) 0%,
-    rgba(0,163,224,0.9) 33%,
-    rgba(255,209,0,0.95) 50%,
-    rgba(206,17,38,0.95) 67%,
-    rgba(0,163,224,0.9) 100%
+    #00A3E0 0%,
+    #00A3E0 35%,
+    #FFD100 50%,
+    #CE1126 65%,
+    #00A3E0 100%
   );
-  box-shadow:0 0 10px rgba(255,209,0,0.15);
+  box-shadow:0 0 12px rgba(255,209,0,0.18);
 }
 
-/* clock */
+/* 🌍 timezone display */
+.timezone{
+  font-size:0.75rem;
+  letter-spacing:0.25em;
+  opacity:0.6;
+  margin-bottom:1rem;
+}
+
+/* 🕒 clock */
 .clock{
   width:120px;
   height:120px;
@@ -100,10 +107,9 @@ body::before{
   margin-top:10px;
   color:#FFD700;
   letter-spacing:0.25em;
-  opacity:0.9;
 }
 
-/* countdown (static luxury spacing) */
+/* ⏳ countdown */
 .countdown{
   display:flex;
   justify-content:center;
@@ -145,10 +151,12 @@ p{
 <div class="box">
 
   <div class="logo">KINOI.S</div>
-
   <div class="flag"></div>
 
-  <!-- CLOCK -->
+  <!-- 🌐 TIMEZONE -->
+  <div class="timezone" id="tz"></div>
+
+  <!-- 🕒 CLOCK -->
   <div class="clock">
     <div class="hand hour" id="hour"></div>
     <div class="hand minute" id="minute"></div>
@@ -157,7 +165,7 @@ p{
 
   <div class="digital" id="digitalClock"></div>
 
-  <!-- COUNTDOWN -->
+  <!-- ⏳ COUNTDOWN -->
   <div class="countdown">
     <div class="time-box"><span id="days"></span>Jours</div>
     <div class="time-box"><span id="hours"></span>Heures</div>
@@ -171,21 +179,25 @@ p{
     <strong>EN</strong> — The digital infrastructure of the Congolese diaspora where talent, projects, and opportunities meet, collaborate, and grow together. A living community is emerging. Launching in 7 days.
   </p>
 
-  <div class="lingala">
-    BISO NA BISO
-  </div>
+  <div class="lingala">BISO NA BISO</div>
 
 </div>
 
 <script>
 
+/* ⏳ UTC BASED LAUNCH (GLOBAL CONSISTENCY) */
 const launchDate = new Date("2026-05-09T00:00:00Z").getTime();
+
+/* 🌐 AUTO TIMEZONE DETECTION */
+const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+document.getElementById("tz").innerText = "TIMEZONE: " + tz;
 
 function update(){
 
   const now = new Date();
   const diff = launchDate - now.getTime();
 
+  /* ⏳ countdown */
   const d = Math.floor(diff/(1000*60*60*24));
   const h = Math.floor((diff/(1000*60*60))%24);
   const m = Math.floor((diff/(1000*60))%60);
@@ -196,6 +208,7 @@ function update(){
   document.getElementById("minutes").innerText = m;
   document.getElementById("seconds").innerText = s;
 
+  /* 🕒 analog clock */
   const sec = now.getSeconds()*6;
   const min = now.getMinutes()*6;
   const hour = (now.getHours()%12)*30 + now.getMinutes()/2;
@@ -209,6 +222,7 @@ function update(){
   document.getElementById("hour").style.transform =
     `translateX(-50%) rotate(${hour}deg)`;
 
+  /* digital */
   document.getElementById("digitalClock").innerText =
     now.toLocaleTimeString();
 
