@@ -17,20 +17,24 @@ body{
   position:relative;
 }
 
-/* ✨ TECH GOLD FONKEL ACHTERGROND (SUBTIEL) */
+/* ✨ SUBTLE GOLD PARTICLE FIELDS (REAL ANIMATION) */
 body::before{
   content:"";
   position:absolute;
   width:100%;
   height:100%;
   background-image:
-    radial-gradient(circle at 10% 20%, rgba(255,215,0,0.08) 1px, transparent 2px),
-    radial-gradient(circle at 30% 80%, rgba(196,154,60,0.06) 1px, transparent 2px),
-    radial-gradient(circle at 70% 40%, rgba(255,209,0,0.05) 1px, transparent 2px),
-    radial-gradient(circle at 90% 60%, rgba(255,215,0,0.04) 1px, transparent 2px);
-  background-size:200px 200px;
-  opacity:0.6;
+    radial-gradient(circle, rgba(255,215,0,0.25) 1px, transparent 1px),
+    radial-gradient(circle, rgba(196,154,60,0.18) 1px, transparent 1px);
+  background-size:120px 120px, 180px 180px;
+  animation:floatStars 18s linear infinite;
+  opacity:0.25;
   pointer-events:none;
+}
+
+@keyframes floatStars{
+  0%{transform:translateY(0px);}
+  100%{transform:translateY(-80px);}
 }
 
 /* vignette */
@@ -58,7 +62,7 @@ body::before{
   background-clip:text;
 }
 
-/* 🇨🇩 FLAG BAR MET BEWEGENDE LIGHT FLARE */
+/* 🇨🇩 FLAG WITH REAL LIGHT SWEEP (VISIBLE MOTION) */
 .flag{
   width:380px;
   height:6px;
@@ -76,30 +80,30 @@ body::before{
   );
 }
 
-/* moving light flash overlay */
+/* moving highlight */
 .flag::after{
   content:"";
   position:absolute;
   top:0;
-  left:-60%;
-  width:40%;
+  left:-50%;
+  width:50%;
   height:100%;
   background:linear-gradient(
     90deg,
     transparent,
-    rgba(255,255,255,0.35),
+    rgba(255,255,255,0.45),
     transparent
   );
   transform:skewX(-20deg);
-  animation:lightSweep 4.5s infinite ease-in-out;
+  animation:flagSweep 3.8s ease-in-out infinite;
 }
 
-@keyframes lightSweep{
+@keyframes flagSweep{
   0%{left:-60%;}
-  100%{left:140%;}
+  100%{left:130%;}
 }
 
-/* 🌍 timezone */
+/* timezone */
 .timezone{
   font-size:0.75rem;
   letter-spacing:0.25em;
@@ -107,7 +111,7 @@ body::before{
   margin-bottom:1rem;
 }
 
-/* 🕒 clock */
+/* clock */
 .clock{
   width:120px;
   height:120px;
@@ -136,7 +140,7 @@ body::before{
   letter-spacing:0.25em;
 }
 
-/* ⏳ countdown */
+/* countdown */
 .countdown{
   display:flex;
   justify-content:center;
@@ -178,12 +182,11 @@ p{
 <div class="box">
 
   <div class="logo">KINOI.S</div>
+
   <div class="flag"></div>
 
-  <!-- timezone -->
   <div class="timezone" id="tz"></div>
 
-  <!-- clock -->
   <div class="clock">
     <div class="hand hour" id="hour"></div>
     <div class="hand minute" id="minute"></div>
@@ -192,7 +195,6 @@ p{
 
   <div class="digital" id="digitalClock"></div>
 
-  <!-- countdown -->
   <div class="countdown">
     <div class="time-box"><span id="days"></span>Jours</div>
     <div class="time-box"><span id="hours"></span>Heures</div>
@@ -201,9 +203,8 @@ p{
   </div>
 
   <p>
-    <strong>KINOI.S</strong> — L’infrastructure digitale de la diaspora congolaise où les talents, les projets et les opportunités se rencontrent, collaborent et évoluent ensemble.<br><br>
-
-    <strong>EN</strong> — The digital infrastructure of the Congolese diaspora where talent, projects, and opportunities meet, collaborate, and grow together.
+    <strong>KINOI.S</strong> — L’infrastructure digitale de la diaspora congolaise où les talents, les projets et les opportunités se rencontrent.<br><br>
+    <strong>EN</strong> — The digital infrastructure of the Congolese diaspora where talent and opportunity converge.
   </p>
 
   <div class="lingala">BISO NA BISO</div>
@@ -212,27 +213,21 @@ p{
 
 <script>
 
-/* ⏳ UTC launch */
 const launchDate = new Date("2026-05-09T00:00:00Z").getTime();
 
-/* 🌍 timezone auto */
+/* timezone */
 document.getElementById("tz").innerText =
-  "TIMEZONE: " + Intl.DateTimeFormat().resolvedOptions().timeZone;
+  Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 function update(){
 
   const now = new Date();
   const diff = launchDate - now.getTime();
 
-  const d = Math.floor(diff/(1000*60*60*24));
-  const h = Math.floor((diff/(1000*60*60))%24);
-  const m = Math.floor((diff/(1000*60))%60);
-  const s = Math.floor((diff/1000)%60);
-
-  document.getElementById("days").innerText = d;
-  document.getElementById("hours").innerText = h;
-  document.getElementById("minutes").innerText = m;
-  document.getElementById("seconds").innerText = s;
+  document.getElementById("days").innerText = Math.floor(diff/(1000*60*60*24));
+  document.getElementById("hours").innerText = Math.floor(diff/(1000*60*60)%24);
+  document.getElementById("minutes").innerText = Math.floor(diff/(1000*60)%60);
+  document.getElementById("seconds").innerText = Math.floor(diff/1000%60);
 
   const sec = now.getSeconds()*6;
   const min = now.getMinutes()*6;
