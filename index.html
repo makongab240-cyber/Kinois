@@ -16,19 +16,32 @@ body{
   color:#EDE8DC;
 }
 
-/* Background glow */
+/* 🌫 noise texture */
+body::after{
+  content:"";
+  position:absolute;
+  width:100%;
+  height:100%;
+  background-image:url("https://www.transparenttextures.com/patterns/noise.png");
+  opacity:0.04;
+  z-index:1;
+  pointer-events:none;
+}
+
+/* 🌟 glow background */
 body::before{
   content:"";
   position:absolute;
-  width:700px;
-  height:700px;
-  background:radial-gradient(circle, rgba(196,154,60,0.15), transparent 70%);
+  width:800px;
+  height:800px;
+  background:radial-gradient(circle, rgba(196,154,60,0.18), transparent 70%);
   animation:pulse 6s infinite ease-in-out;
+  z-index:0;
 }
 
 @keyframes pulse{
   0%,100%{transform:scale(1);opacity:0.4;}
-  50%{transform:scale(1.3);opacity:0.7;}
+  50%{transform:scale(1.3);opacity:0.8;}
 }
 
 /* vignette */
@@ -36,30 +49,31 @@ body::before{
   position:absolute;
   width:100%;
   height:100%;
-  background:radial-gradient(circle at center, transparent 60%, rgba(0,0,0,0.85));
-  z-index:1;
+  background:radial-gradient(circle at center, transparent 55%, rgba(0,0,0,0.9));
+  z-index:2;
 }
 
-/* particles */
+/* ✨ particles */
 .particles span{
   position:absolute;
-  width:2px;
-  height:2px;
+  width:3px;
+  height:3px;
   background:#FFD700;
   border-radius:50%;
-  opacity:0.5;
-  animation:float 10s linear infinite;
+  opacity:0.6;
+  animation:float 12s linear infinite;
+  filter:blur(0.5px);
 }
 
 @keyframes float{
-  from{transform:translateY(100vh);}
-  to{transform:translateY(-10vh);}
+  from{transform:translateY(100vh) scale(0.8);}
+  to{transform:translateY(-10vh) scale(1.2);}
 }
 
 /* container */
 .box{
   text-align:center;
-  z-index:2;
+  z-index:3;
   opacity:0;
   transform:translateY(20px);
   animation:fadeIn 2s ease forwards;
@@ -69,10 +83,10 @@ body::before{
   to{opacity:1; transform:translateY(0);}
 }
 
-/* logo */
+/* 🟡 logo */
 .logo{
-  font-size:3.5rem;
-  letter-spacing:0.7em;
+  font-size:3.6rem;
+  letter-spacing:0.75em;
   margin-bottom:2rem;
   background:linear-gradient(120deg,#C49A3C,#FFD700,#FFF2B0,#C49A3C);
   background-size:300% auto;
@@ -80,6 +94,25 @@ body::before{
   -webkit-background-clip:text;
   background-clip:text;
   animation:shimmer 5s linear infinite;
+  position:relative;
+}
+
+/* light sweep */
+.logo::after{
+  content:"";
+  position:absolute;
+  top:0;
+  left:-50%;
+  width:50%;
+  height:100%;
+  background:linear-gradient(120deg,transparent,rgba(255,255,255,0.25),transparent);
+  transform:skewX(-20deg);
+  animation:sweep 4s infinite;
+}
+
+@keyframes sweep{
+  0%{left:-60%;}
+  100%{left:120%;}
 }
 
 @keyframes shimmer{
@@ -87,9 +120,9 @@ body::before{
   100%{background-position:-200% center;}
 }
 
-/* flag beam */
+/* 🇨🇩 flag */
 .flag{
-  width:340px;
+  width:360px;
   height:6px;
   margin:0 auto 2rem auto;
   transform:skewX(-25deg);
@@ -103,14 +136,19 @@ body::before{
     #00A3E0 70%,
     #00A3E0 100%
   );
-  background-size:250% 100%;
-  animation:move 5s linear infinite;
-  box-shadow:0 0 15px rgba(255,209,0,0.5);
+  background-size:300% 100%;
+  animation:move 4s linear infinite, glowFlag 2s ease-in-out infinite;
+  box-shadow:0 0 18px rgba(255,209,0,0.5);
 }
 
 @keyframes move{
   0%{background-position:0;}
-  100%{background-position:250%;}
+  100%{background-position:300%;}
+}
+
+@keyframes glowFlag{
+  0%,100%{filter:brightness(1);}
+  50%{filter:brightness(1.3);}
 }
 
 /* countdown */
@@ -119,11 +157,17 @@ body::before{
   justify-content:center;
   gap:25px;
   margin:2rem 0;
+  animation:countGlow 3s ease-in-out infinite;
+}
+
+@keyframes countGlow{
+  0%,100%{text-shadow:0 0 5px rgba(255,215,0,0.2);}
+  50%{text-shadow:0 0 15px rgba(255,215,0,0.6);}
 }
 
 .time-box span{
   display:block;
-  font-size:2rem;
+  font-size:2.2rem;
   color:#FFD700;
 }
 
@@ -152,21 +196,77 @@ body::before{
 .digital{
   margin-top:10px;
   color:#FFD700;
-  letter-spacing:0.2em;
+  letter-spacing:0.25em;
+  opacity:0.9;
 }
 
+/* 🌍 text */
 p{
   margin-top:1.5rem;
   font-size:1rem;
-  letter-spacing:0.3em;
-  color:rgba(237,232,220,0.7);
+  letter-spacing:0.25em;
+  color:rgba(237,232,220,0.75);
+  max-width:900px;
+  line-height:1.8;
+}
+
+/* 🇨🇩 LINGALA SIGNATURE */
+.lingala{
+  margin-top:2.5rem;
+  font-size:1rem;
+  letter-spacing:0.5em;
+  color:rgba(255,215,0,0.95);
+  text-transform:uppercase;
+  position:relative;
+  display:inline-block;
+  animation:lingalaPulse 3s ease-in-out infinite;
+}
+
+/* glow aura */
+.lingala::before{
+  content:"";
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:220%;
+  height:220%;
+  background:radial-gradient(circle, rgba(255,215,0,0.25), transparent 60%);
+  z-index:-1;
+  animation:aura 4s ease-in-out infinite;
+}
+
+/* shine line */
+.lingala::after{
+  content:"";
+  position:absolute;
+  left:0;
+  bottom:-8px;
+  width:100%;
+  height:2px;
+  background:linear-gradient(90deg,transparent,#FFD700,transparent);
+  animation:shine 3s linear infinite;
+}
+
+@keyframes lingalaPulse{
+  0%,100%{transform:scale(1); opacity:0.85;}
+  50%{transform:scale(1.05); opacity:1;}
+}
+
+@keyframes aura{
+  0%,100%{opacity:0.4;}
+  50%{opacity:0.9;}
+}
+
+@keyframes shine{
+  0%{transform:translateX(-100%);}
+  100%{transform:translateX(100%);}
 }
 </style>
 </head>
 
 <body>
 
-<!-- particles -->
 <div class="particles">
   <span style="left:10%;animation-delay:0s"></span>
   <span style="left:20%;animation-delay:2s"></span>
@@ -203,24 +303,27 @@ p{
     <div class="time-box"><span id="seconds"></span>Secondes</div>
   </div>
 
-  <p>LANCEMENT BIENTÔT — LE PREMIER HUB DIGITAL DE LA DIASPORA CONGOLAISE</p>
+  <p>
+    <strong>KINOI.S</strong> — L’infrastructure digitale de la diaspora congolaise où les talents, les projets et les opportunités se rencontrent, collaborent et évoluent ensemble. Une communauté en mouvement. Déploiement dans 7 jours.<br><br>
+
+    <strong>EN</strong> — The digital infrastructure of the Congolese diaspora where talent, projects, and opportunities meet, collaborate, and grow together. A living community is emerging. Launching in 7 days.
+  </p>
+
+  <div class="lingala">
+    BISO NA BISO
+  </div>
 
 </div>
 
 <script>
-// 🌍 Launch time (UTC - stable worldwide)
-const launchDate = new Date("2026-05-09T00:00:00Z").getTime();
 
-// 🌐 detect timezone (future use)
-const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-console.log("User timezone:", userTimeZone);
+const launchDate = new Date("2026-05-09T00:00:00Z").getTime();
 
 function update(){
 
   const now = new Date();
   const diff = launchDate - now.getTime();
 
-  // countdown
   const d = Math.floor(diff/(1000*60*60*24));
   const h = Math.floor((diff/(1000*60*60))%24);
   const m = Math.floor((diff/(1000*60))%60);
@@ -231,7 +334,6 @@ function update(){
   document.getElementById("minutes").innerText = m;
   document.getElementById("seconds").innerText = s;
 
-  // analog clock
   const sec = now.getSeconds()*6;
   const min = now.getMinutes()*6;
   const hour = (now.getHours()%12)*30 + now.getMinutes()/2;
@@ -245,7 +347,6 @@ function update(){
   document.getElementById("hour").style.transform =
     `translateX(-50%) rotate(${hour}deg)`;
 
-  // digital clock
   document.getElementById("digitalClock").innerText =
     now.toLocaleTimeString();
 
@@ -253,6 +354,7 @@ function update(){
 
 setInterval(update,1000);
 update();
+
 </script>
 
 </body>
