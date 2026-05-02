@@ -806,8 +806,8 @@ body{font-family:'Montserrat',sans-serif;font-weight:300;color:var(--w)}
           <p class="privacy-p">Vous conservez la propriété de vos contenus, mais accordez à KINOI.S une licence non exclusive pour les afficher sur la plateforme. L'architecture, le design et le code de KINOI.S sont la propriété exclusive de Boris Makonga (BMA).</p>
           <h2 class="privacy-h2">4. Responsabilité</h2>
           <p class="privacy-p">KINOI.S ne peut être tenu responsable des contenus publiés par les utilisateurs. Tout contenu signalé sera examiné dans un délai de 72 heures.</p>
-          <h2 class="privacy-h2">5. Abonnements</h2>
-          <p class="privacy-p">Les abonnements Élite (€7/mois) et Makambu (€19/mois) sont renouvelés automatiquement. Vous disposez d'un droit de rétractation de 14 jours. Les paiements sont traités par Paddle (Merchant of Record).</p>
+          <h2 class="privacy-h2">5. Abonnements et résiliation</h2>
+          <p class="privacy-p">Les abonnements Élite (€7/mois) et Makambu (€19/mois) sont renouvelés automatiquement chaque mois. Vous disposez d'un droit de rétractation de 14 jours à compter de la souscription. Vous pouvez résilier votre abonnement à tout moment via votre profil → "Gérer mon abonnement", ou en envoyant un email à <strong>contact@kinoiss.com</strong>. La résiliation prend effet à la fin de la période en cours. Aucun remboursement partiel n'est effectué sauf pendant la période de rétractation de 14 jours. Les paiements sont traités par Paddle (Merchant of Record).</p>
           <h2 class="privacy-h2">6. Droit applicable</h2>
           <p class="privacy-p">Les présentes CGU sont soumises au droit belge. En cas de litige, les tribunaux de Bruxelles sont compétents.</p>
           <h2 class="privacy-h2">7. Contact</h2>
@@ -882,6 +882,7 @@ body{font-family:'Montserrat',sans-serif;font-weight:300;color:var(--w)}
     <div class="myprof-field"><label class="myprof-label">Ville d'origine au Congo</label><input class="myprof-input" id="myprof-origin" type="text" placeholder="Kinshasa, Lubumbashi, Goma…"/></div>
     <div class="myprof-field"><label class="myprof-label">Bio</label><input class="myprof-input" id="myprof-bio" type="text" placeholder="Qui es-tu ? Que fais-tu ?"/></div>
     <button class="myprof-save" onclick="saveProfile()">Sauvegarder</button>
+    <button class="myprof-logout" style="background:none;border:1px solid var(--gb2);color:var(--gold);margin-top:0.5rem;width:100%;padding:0.6rem;font-family:'Montserrat',sans-serif;font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;" onclick="manageSub()">Gérer mon abonnement</button>
     <button class="myprof-logout" onclick="logout()">Se déconnecter</button>
   </div>
 </div>
@@ -897,14 +898,22 @@ body{font-family:'Montserrat',sans-serif;font-weight:300;color:var(--w)}
       <div class="uplan sel" onclick="selPlan(this)"><div class="uplan-name">Élite</div><div class="uplan-price">€7<span style="font-size:0.7rem;color:var(--w3)">/mois</span></div><div class="uplan-desc">Culture + Business</div></div>
       <div class="uplan" onclick="selPlan(this)"><div class="uplan-name">Makambu</div><div class="uplan-price">€19<span style="font-size:0.7rem;color:var(--w3)">/mois</span></div><div class="uplan-desc">Réseau pro complet</div></div>
     </div>
-    <button class="up-btn-gold" onclick="showToast('Redirection vers le paiement… 💳');hideUpgrade()">Continuer</button>
+    <button class="up-btn-gold" onclick="openPaddleCheckout()">Continuer</button>
   </div>
 </div>
 
 <!-- ONBOARDING -->
 <div id="onboarding">
   <div class="ob-box">
-    <div class="ob-progress"><div class="ob-dot on" id="obd1"></div><div class="ob-dot" id="obd2"></div><div class="ob-dot" id="obd3"></div></div>
+    <div class="ob-progress">
+      <div class="ob-dot on" id="obd1"></div>
+      <div class="ob-dot" id="obd2"></div>
+      <div class="ob-dot" id="obd3"></div>
+      <div class="ob-dot" id="obd4"></div>
+      <div class="ob-dot" id="obd5"></div>
+    </div>
+
+    <!-- Step 1 — Origin -->
     <div id="ob1">
       <div class="ob-icon">🌍</div>
       <div class="ob-title">Tu viens d'où ?</div>
@@ -920,10 +929,12 @@ body{font-family:'Montserrat',sans-serif;font-weight:300;color:var(--w)}
       </div>
       <div class="ob-btns"><button class="ob-btn ob-btn-skip" onclick="hideOnboarding()">Passer</button><button class="ob-btn ob-btn-next" onclick="obNext(2)">Suivant</button></div>
     </div>
+
+    <!-- Step 2 — Interests -->
     <div id="ob2" style="display:none">
       <div class="ob-icon">💼</div>
       <div class="ob-title">Tes intérêts ?</div>
-      <div class="ob-sub">Choisis ce qui te parle.</div>
+      <div class="ob-sub">Choisis ce qui te parle le plus.</div>
       <div class="ob-options">
         <div class="ob-opt" onclick="this.classList.toggle('sel')">💼 Business</div>
         <div class="ob-opt" onclick="this.classList.toggle('sel')">🎵 Musique</div>
@@ -934,12 +945,74 @@ body{font-family:'Montserrat',sans-serif;font-weight:300;color:var(--w)}
       </div>
       <div class="ob-btns"><button class="ob-btn ob-btn-skip" onclick="hideOnboarding()">Passer</button><button class="ob-btn ob-btn-next" onclick="obNext(3)">Suivant</button></div>
     </div>
+
+    <!-- Step 3 — App tour: navigation -->
     <div id="ob3" style="display:none">
-      <div class="ob-icon">🤝</div>
-      <div class="ob-title">Bienvenue sur KINOI.S</div>
-      <div class="ob-sub">Tu fais maintenant partie de la diaspora congolaise connectée. <em>Biso na biso.</em></div>
-      <div class="ob-btns"><button class="ob-btn ob-btn-next" onclick="hideOnboarding()">Commencer</button></div>
+      <div class="ob-icon">🧭</div>
+      <div class="ob-title">Comment naviguer</div>
+      <div class="ob-sub">Voici les 5 sections de KINOI.S :</div>
+      <div style="width:100%;text-align:left;margin-bottom:1.2rem">
+        <div style="display:flex;align-items:flex-start;gap:0.8rem;padding:0.6rem 0;border-bottom:1px solid var(--gb)">
+          <span style="font-size:1.2rem">🏠</span>
+          <div><div style="font-size:0.78rem;color:var(--w);font-weight:500">Feed</div><div style="font-size:0.68rem;color:var(--w3);margin-top:0.1rem">Actualités, posts de la communauté, Congo en direct</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:0.8rem;padding:0.6rem 0;border-bottom:1px solid var(--gb)">
+          <span style="font-size:1.2rem">🔍</span>
+          <div><div style="font-size:0.78rem;color:var(--w);font-weight:500">Explorer</div><div style="font-size:0.68rem;color:var(--w3);margin-top:0.1rem">Découvre les contenus par catégorie — musique, SAPE, business…</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:0.8rem;padding:0.6rem 0;border-bottom:1px solid var(--gb)">
+          <span style="font-size:1.2rem">🤝</span>
+          <div><div style="font-size:0.78rem;color:var(--w);font-weight:500">Réseau</div><div style="font-size:0.68rem;color:var(--w3);margin-top:0.1rem">Connecte-toi avec des professionnels congolais partout dans le monde</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:0.8rem;padding:0.6rem 0;border-bottom:1px solid var(--gb)">
+          <span style="font-size:1.2rem">🎟️</span>
+          <div><div style="font-size:0.78rem;color:var(--w);font-weight:500">Events</div><div style="font-size:0.68rem;color:var(--w3);margin-top:0.1rem">Concerts, networking, rassemblements — postés par les membres</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:0.8rem;padding:0.6rem 0">
+          <span style="font-size:1.2rem">💬</span>
+          <div><div style="font-size:0.78rem;color:var(--w);font-weight:500">Messages</div><div style="font-size:0.68rem;color:var(--w3);margin-top:0.1rem">Discute en privé avec les membres de ton réseau</div></div>
+        </div>
+      </div>
+      <div class="ob-btns"><button class="ob-btn ob-btn-skip" onclick="hideOnboarding()">Passer</button><button class="ob-btn ob-btn-next" onclick="obNext(4)">Suivant</button></div>
     </div>
+
+    <!-- Step 4 — How to post + profile -->
+    <div id="ob4" style="display:none">
+      <div class="ob-icon">✍️</div>
+      <div class="ob-title">Poster et ton profil</div>
+      <div class="ob-sub">Ce que tu peux faire dès maintenant :</div>
+      <div style="width:100%;text-align:left;margin-bottom:1.2rem">
+        <div style="display:flex;align-items:flex-start;gap:0.8rem;padding:0.6rem 0;border-bottom:1px solid var(--gb)">
+          <span style="font-size:1.2rem">📝</span>
+          <div><div style="font-size:0.78rem;color:var(--w);font-weight:500">Publier un post</div><div style="font-size:0.68rem;color:var(--w3);margin-top:0.1rem">Dans le Feed, écris un message, choisis une catégorie et publie</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:0.8rem;padding:0.6rem 0;border-bottom:1px solid var(--gb)">
+          <span style="font-size:1.2rem">📷</span>
+          <div><div style="font-size:0.78rem;color:var(--w);font-weight:500">Ajouter une photo</div><div style="font-size:0.68rem;color:var(--w3);margin-top:0.1rem">Clique sur 📷 dans le Feed pour joindre une image à ton post</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:0.8rem;padding:0.6rem 0;border-bottom:1px solid var(--gb)">
+          <span style="font-size:1.2rem">👤</span>
+          <div><div style="font-size:0.78rem;color:var(--w);font-weight:500">Modifier ton profil</div><div style="font-size:0.68rem;color:var(--w3);margin-top:0.1rem">Clique sur ton avatar en haut à droite pour modifier bio, ville et photo</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:0.8rem;padding:0.6rem 0">
+          <span style="font-size:1.2rem">👑</span>
+          <div><div style="font-size:0.78rem;color:var(--w);font-weight:500">Devenir Élite ou Makambu</div><div style="font-size:0.68rem;color:var(--w3);margin-top:0.1rem">Clique sur "Devenir Élite" pour accéder aux fonctionnalités premium</div></div>
+        </div>
+      </div>
+      <div class="ob-btns"><button class="ob-btn ob-btn-skip" onclick="hideOnboarding()">Passer</button><button class="ob-btn ob-btn-next" onclick="obNext(5)">Suivant</button></div>
+    </div>
+
+    <!-- Step 5 — Welcome -->
+    <div id="ob5" style="display:none">
+      <div class="ob-icon">🇨🇩</div>
+      <div class="ob-title">Bienvenue sur KINOI.S</div>
+      <div class="ob-sub">Tu fais maintenant partie de la diaspora congolaise connectée.<br/><br/><em style="color:var(--gold)">Biso na biso — partout dans le monde.</em></div>
+      <div style="font-size:0.7rem;color:var(--w3);margin-bottom:1.2rem;line-height:1.7">
+        Des questions ? Écris-nous à <strong style="color:var(--gold)">contact@kinoiss.com</strong>
+      </div>
+      <div class="ob-btns"><button class="ob-btn ob-btn-next" onclick="hideOnboarding()">Commencer 🚀</button></div>
+    </div>
+
   </div>
 </div>
 
@@ -948,7 +1021,7 @@ body{font-family:'Montserrat',sans-serif;font-weight:300;color:var(--w)}
 <script>
 // ── SUPABASE CONFIG ──────────────────────────────────
 const SUPABASE_URL = 'https://agokbgqcjwovkrqzewou.supabase.co';
-const SUPABASE_ANON_KEY = 'VOTRE_ANON_KEY_ICI'; // ← Remplace par ta vraie clé
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnb2tiZ3FjandvdmtycXpld291Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MTA0NDEsImV4cCI6MjA5MzI4NjQ0MX0.4yPpSLnqFZZc67iScTsceUh8INZ-vM1qrM0Ev8h4mdg'; // ← Remplace par ta vraie clé
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ── STATE ────────────────────────────────────────────
@@ -1331,8 +1404,18 @@ function go(page, el){
   const main = document.getElementById('main');
   if(main) main.scrollTop = 0;
 }
-function showPrivacy(){ go('privacy'); }
-function showCGU(){ go('cgu'); }
+function showPrivacy(){
+  document.getElementById('landing').classList.remove('show');
+  document.getElementById('login-screen').classList.remove('show');
+  document.getElementById('app').classList.add('visible');
+  go('privacy');
+}
+function showCGU(){
+  document.getElementById('landing').classList.remove('show');
+  document.getElementById('login-screen').classList.remove('show');
+  document.getElementById('app').classList.add('visible');
+  go('cgu');
+}
 
 // ── UI HELPERS ───────────────────────────────────────
 function showUpgrade(){ document.getElementById('upgrade-modal').classList.add('show'); }
@@ -1340,11 +1423,34 @@ function hideUpgrade(){ document.getElementById('upgrade-modal').classList.remov
 function selPlan(el){ el.closest('.u-plans').querySelectorAll('.uplan').forEach(p => p.classList.remove('sel')); el.classList.add('sel'); }
 function conn(btn){ btn.classList.toggle('on'); btn.textContent = btn.classList.contains('on') ? 'Connecté ✓' : '+ Connecter'; }
 function rconn(btn){ btn.classList.toggle('on'); btn.textContent = btn.classList.contains('on') ? 'Connecté' : 'Connecter'; }
+// ── PADDLE CHECKOUT ──────────────────────────────────
+const PADDLE_ELITE_PRICE   = 'pri_01kqmbk7394xvh731dbadfbkmp';
+const PADDLE_MAKAMBU_PRICE = 'pri_01kqmbre6vjv1qvsaeq2ws9yje';
+
+function openPaddleCheckout(){
+  const selPlanEl = document.querySelector('.uplan.sel .uplan-name');
+  const planName = selPlanEl ? selPlanEl.textContent.trim() : 'Élite';
+  const priceId = planName === 'Makambu' ? PADDLE_MAKAMBU_PRICE : PADDLE_ELITE_PRICE;
+  const email = currentUser ? currentUser.email : '';
+  const url = `https://buy.paddle.com/product/${priceId}${email ? '?prefill_email='+encodeURIComponent(email) : ''}`;
+  hideUpgrade();
+  window.open(url, '_blank');
+}
+
+function manageSub(){
+  hideMyProfile();
+  const email = currentUser ? currentUser.email : '';
+  // Paddle customer portal
+  const url = `https://vendors.paddle.com/subscriptions/customers/manage${email ? '?email='+encodeURIComponent(email) : ''}`;
+  showToast('Redirection vers la gestion d\'abonnement…');
+  setTimeout(() => window.open('https://www.paddle.com/account', '_blank'), 800);
+}
+
 function showToast(msg){ document.getElementById('tmsg').textContent = msg; const t = document.getElementById('toast'); t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3200); }
 
 // ── ONBOARDING ───────────────────────────────────────
 function selObOpt(el, type){ el.parentElement.querySelectorAll('.ob-opt').forEach(o => o.classList.remove('sel')); el.classList.add('sel'); if(type==='origin') selectedOrigin = el.textContent; }
-function obNext(step){ document.querySelectorAll('#ob1,#ob2,#ob3').forEach(s => s.style.display='none'); document.getElementById('ob'+step).style.display='block'; for(let i=1;i<=3;i++) document.getElementById('obd'+i).classList.toggle('on',i<=step); }
+function obNext(step){ document.querySelectorAll('#ob1,#ob2,#ob3,#ob4,#ob5').forEach(s => s.style.display='none'); document.getElementById('ob'+step).style.display='block'; for(let i=1;i<=5;i++) document.getElementById('obd'+i).classList.toggle('on',i<=step); }
 function hideOnboarding(){ document.getElementById('onboarding').classList.remove('show'); if(selectedOrigin && currentUser){ sb.from('profiles').update({origin:selectedOrigin}).eq('id',currentUser.id).then(() => { if(currentProfile) currentProfile.origin = selectedOrigin; }); } showToast('Bienvenue sur KINOI.S 🇨🇩'); }
 
 // ── COOKIES ──────────────────────────────────────────
