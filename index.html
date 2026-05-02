@@ -17,24 +17,17 @@ body{
   position:relative;
 }
 
-/* 🌫 cinematic noise */
-body::after{
+/* 🌟 static golden sparkle background (VERY subtle) */
+body::before{
   content:"";
   position:absolute;
   width:100%;
   height:100%;
-  background-image:url("https://www.transparenttextures.com/patterns/noise.png");
-  opacity:0.05;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(255,215,0,0.05) 0%, transparent 40%),
+    radial-gradient(circle at 70% 60%, rgba(196,154,60,0.04) 0%, transparent 45%),
+    radial-gradient(circle at 40% 80%, rgba(255,215,0,0.03) 0%, transparent 50%);
   pointer-events:none;
-}
-
-/* 🌟 soft glow */
-body::before{
-  content:"";
-  position:absolute;
-  width:750px;
-  height:750px;
-  background:radial-gradient(circle, rgba(196,154,60,0.16), transparent 70%);
 }
 
 /* vignette */
@@ -42,7 +35,8 @@ body::before{
   position:absolute;
   width:100%;
   height:100%;
-  background:radial-gradient(circle at center, transparent 55%, rgba(0,0,0,0.92));
+  background:radial-gradient(circle at center, transparent 60%, rgba(0,0,0,0.92));
+  pointer-events:none;
 }
 
 /* container */
@@ -62,38 +56,28 @@ body::before{
   background-clip:text;
 }
 
-/* 🇨🇩 flag beam */
+/* 🇨🇩 flag line (SUBTLE flowing gradient, no movement) */
 .flag{
-  width:360px;
+  width:380px;
   height:6px;
   margin:0 auto 2rem auto;
   transform:skewX(-25deg);
   background:linear-gradient(
     90deg,
-    #00A3E0 0%,
-    #00A3E0 35%,
-    #FFD100 48%,
-    #CE1126 52%,
-    #FFD100 55%,
-    #00A3E0 70%,
-    #00A3E0 100%
+    rgba(0,163,224,0.9) 0%,
+    rgba(0,163,224,0.9) 33%,
+    rgba(255,209,0,0.95) 50%,
+    rgba(206,17,38,0.95) 67%,
+    rgba(0,163,224,0.9) 100%
   );
-  box-shadow:0 0 12px rgba(255,209,0,0.25);
+  box-shadow:0 0 10px rgba(255,209,0,0.15);
 }
 
-/* 🌍 timezone display */
-.timezone{
-  font-size:0.8rem;
-  letter-spacing:0.25em;
-  opacity:0.6;
-  margin-bottom:1rem;
-}
-
-/* 🕒 clock */
+/* clock */
 .clock{
   width:120px;
   height:120px;
-  border:2px solid rgba(255,215,0,0.35);
+  border:2px solid rgba(255,215,0,0.25);
   border-radius:50%;
   margin:1rem auto;
   position:relative;
@@ -111,14 +95,15 @@ body::before{
 .minute{width:3px;height:40px;background:#FFD700;}
 .second{width:2px;height:45px;background:#CE1126;}
 
-/* digital */
+/* digital clock */
 .digital{
   margin-top:10px;
   color:#FFD700;
   letter-spacing:0.25em;
+  opacity:0.9;
 }
 
-/* ⏳ countdown */
+/* countdown (static luxury spacing) */
 .countdown{
   display:flex;
   justify-content:center;
@@ -142,7 +127,7 @@ p{
   line-height:1.8;
 }
 
-/* 🇨🇩 identity */
+/* identity */
 .lingala{
   margin-top:2.5rem;
   font-size:1rem;
@@ -160,12 +145,10 @@ p{
 <div class="box">
 
   <div class="logo">KINOI.S</div>
+
   <div class="flag"></div>
 
-  <!-- 🌍 timezone -->
-  <div class="timezone" id="tz"></div>
-
-  <!-- 🕒 analog clock -->
+  <!-- CLOCK -->
   <div class="clock">
     <div class="hand hour" id="hour"></div>
     <div class="hand minute" id="minute"></div>
@@ -174,7 +157,7 @@ p{
 
   <div class="digital" id="digitalClock"></div>
 
-  <!-- ⏳ countdown -->
+  <!-- COUNTDOWN -->
   <div class="countdown">
     <div class="time-box"><span id="days"></span>Jours</div>
     <div class="time-box"><span id="hours"></span>Heures</div>
@@ -188,25 +171,21 @@ p{
     <strong>EN</strong> — The digital infrastructure of the Congolese diaspora where talent, projects, and opportunities meet, collaborate, and grow together. A living community is emerging. Launching in 7 days.
   </p>
 
-  <div class="lingala">BISO NA BISO</div>
+  <div class="lingala">
+    BISO NA BISO
+  </div>
 
 </div>
 
 <script>
 
-/* 🌍 UTC-based launch (global sync) */
 const launchDate = new Date("2026-05-09T00:00:00Z").getTime();
-
-/* 🌐 timezone detection */
-const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-document.getElementById("tz").innerText = "YOUR TIMEZONE: " + tz;
 
 function update(){
 
   const now = new Date();
   const diff = launchDate - now.getTime();
 
-  /* ⏳ countdown */
   const d = Math.floor(diff/(1000*60*60*24));
   const h = Math.floor((diff/(1000*60*60))%24);
   const m = Math.floor((diff/(1000*60))%60);
@@ -217,7 +196,6 @@ function update(){
   document.getElementById("minutes").innerText = m;
   document.getElementById("seconds").innerText = s;
 
-  /* 🕒 analog clock */
   const sec = now.getSeconds()*6;
   const min = now.getMinutes()*6;
   const hour = (now.getHours()%12)*30 + now.getMinutes()/2;
@@ -231,7 +209,6 @@ function update(){
   document.getElementById("hour").style.transform =
     `translateX(-50%) rotate(${hour}deg)`;
 
-  /* digital clock */
   document.getElementById("digitalClock").innerText =
     now.toLocaleTimeString();
 
