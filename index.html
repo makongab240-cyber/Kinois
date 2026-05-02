@@ -17,24 +17,28 @@ body{
   position:relative;
 }
 
-/* ✨ very subtle golden tech sparkles */
+/* ✨ REAL GOLD TWINKLE FIELD (VISIBLE ANIMATION) */
 body::before{
   content:"";
   position:absolute;
   width:100%;
   height:100%;
-  background-image:
-    radial-gradient(circle, rgba(255,215,0,0.12) 1px, transparent 1px),
-    radial-gradient(circle, rgba(196,154,60,0.08) 1px, transparent 1px);
-  background-size:140px 140px, 220px 220px;
-  opacity:0.25;
-  animation:slowFloat 25s linear infinite;
+  background:
+    radial-gradient(circle at 10% 20%, rgba(255,215,0,0.6) 1px, transparent 2px),
+    radial-gradient(circle at 30% 70%, rgba(196,154,60,0.4) 1px, transparent 2px),
+    radial-gradient(circle at 70% 40%, rgba(255,209,0,0.5) 1px, transparent 2px),
+    radial-gradient(circle at 85% 80%, rgba(255,215,0,0.35) 1px, transparent 2px);
+  background-size:180px 180px;
+  animation:twinkleMove 8s linear infinite;
+  opacity:0.35;
   pointer-events:none;
 }
 
-@keyframes slowFloat{
-  0%{transform:translateY(0);}
-  100%{transform:translateY(-60px);}
+/* movement makes it feel alive */
+@keyframes twinkleMove{
+  0%{transform:translateY(0px) scale(1);}
+  50%{transform:translateY(-20px) scale(1.02);}
+  100%{transform:translateY(0px) scale(1);}
 }
 
 /* vignette */
@@ -62,7 +66,7 @@ body::before{
   background-clip:text;
 }
 
-/* 🇨🇩 FLAG BAR (NOW FIXED + SUBTLE MOVEMENT ONLY IN HIGHLIGHT) */
+/* 🇨🇩 FLAG WITH REAL LIGHT FLARE (VISIBLE SWEEP) */
 .flag{
   width:380px;
   height:6px;
@@ -70,6 +74,7 @@ body::before{
   transform:skewX(-25deg);
   position:relative;
   overflow:hidden;
+
   background:linear-gradient(
     90deg,
     #00A3E0 0%,
@@ -80,26 +85,27 @@ body::before{
   );
 }
 
-/* moving light reflection (SUBTLE ONLY) */
+/* moving highlight = real visible flash */
 .flag::after{
   content:"";
   position:absolute;
   top:0;
-  left:-50%;
+  left:-60%;
   width:40%;
   height:100%;
   background:linear-gradient(
     90deg,
     transparent,
-    rgba(255,255,255,0.35),
+    rgba(255,255,255,0.55),
     transparent
   );
-  animation:shine 5s ease-in-out infinite;
+  transform:skewX(-20deg);
+  animation:flashSweep 3.2s ease-in-out infinite;
 }
 
-@keyframes shine{
+@keyframes flashSweep{
   0%{left:-60%;}
-  100%{left:130%;}
+  100%{left:140%;}
 }
 
 /* timezone */
@@ -202,9 +208,9 @@ p{
   </div>
 
   <p>
-    <strong>KINOI.S</strong> — L’infrastructure digitale de la diaspora congolaise où les talents, les projets et les opportunités se rencontrent et évoluent ensemble.<br><br>
+    L’infrastructure digitale de la diaspora congolaise où les talents, les projets et les opportunités se rencontrent, collaborent et évoluent ensemble.<br><br>
 
-    <strong>EN</strong> — The digital infrastructure of the Congolese diaspora where talent and opportunity converge into one ecosystem.
+    The digital infrastructure of the Congolese diaspora where talent and opportunity converge into one ecosystem.
   </p>
 
   <div class="lingala">BISO NA BISO</div>
