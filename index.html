@@ -1,74 +1,1661 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr" prefix="og: https://ogp.me/ns#">
 <head>
 <meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,viewport-fit=cover"/>
+<meta name="theme-color" content="#C49A3C"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="KINOI.S"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="format-detection" content="telephone=no"/>
+
+<!-- SEO -->
+<title>KINOI.S — Le réseau de la diaspora congolaise</title>
+<meta name="description" content="KINOI.S est le premier réseau social dédié à la diaspora congolaise dans le monde. Business, culture, communauté — biso na biso, partout dans le monde."/>
+<meta name="keywords" content="diaspora congolaise, réseau social congolais, Kinshasa, Lubumbashi, Congo, RDC, Kinois, biso na biso"/>
+<meta name="robots" content="index, follow"/>
+<link rel="canonical" href="https://kinoiss.com"/>
+
+<!-- Open Graph -->
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://kinoiss.com"/>
+<meta property="og:title" content="KINOI.S — Le réseau de la diaspora congolaise"/>
+<meta property="og:description" content="Business, culture, communauté — biso na biso, partout dans le monde."/>
+<meta property="og:image" content="https://kinoiss.com/og-image.png"/>
+<meta property="og:locale" content="fr_FR"/>
+<meta property="og:site_name" content="KINOI.S"/>
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="KINOI.S — Diaspora Congolaise"/>
+<meta name="twitter:description" content="Le premier réseau social dédié à la diaspora congolaise. Biso na biso."/>
+
+<!-- PWA -->
+<link rel="manifest" href="/manifest.json"/>
+<link rel="apple-touch-icon" href="/icon-192.png"/>
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"KINOI.S","url":"https://kinoiss.com","description":"Premier réseau social de la diaspora congolaise","applicationCategory":"SocialNetworkingApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}}
+</script>
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#C49A3C;--gold2:#E0B555;--copper:#C4831A;
+  --w:#EDE8DC;--w2:rgba(237,232,220,0.7);--w3:rgba(237,232,220,0.35);--w4:rgba(237,232,220,0.06);
+  --glass:rgba(8,10,14,0.72);--glass2:rgba(8,10,14,0.92);
+  --gb:rgba(196,154,60,0.15);--gb2:rgba(196,154,60,0.32);
+  --grn:#4CAF7D;--red:#E05252;--blue:#5B8DEF;
+  --nav:68px;--top:54px;--bot:62px;
+  --radius:2px;
+}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{
-  background:#07090D;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  height:100vh;
-  margin:0;
-  font-family:sans-serif;
-  overflow:hidden;
+  font-family:'Montserrat',sans-serif;font-weight:300;color:var(--w);
+  background:#07090D;height:100%;overflow:hidden;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;
+  image-rendering:-webkit-optimize-contrast;
 }
+img{image-rendering:-webkit-optimize-contrast;max-width:100%}
 
-/* Fade-in effect */
-.box{
-  text-align:center;
-  color:#EDE8DC;
-  opacity:0;
-  transform:translateY(10px);
-  animation:fadeIn 1.5s ease forwards;
-}
+/* ── BACKGROUND ── */
+#bg-layer{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 60% 60% at 10% 20%,rgba(8,32,68,0.7) 0%,transparent 55%),
+    radial-gradient(ellipse 55% 65% at 90% 80%,rgba(5,20,8,0.8) 0%,transparent 55%),
+    radial-gradient(ellipse 45% 45% at 55% 10%,rgba(26,12,4,0.65) 0%,transparent 50%),
+    radial-gradient(ellipse 50% 50% at 20% 90%,rgba(18,6,28,0.7) 0%,transparent 50%),
+    linear-gradient(160deg,#04070F,#060A07,#080604);
+  animation:bgDrift 30s ease-in-out infinite alternate}
+@keyframes bgDrift{0%{transform:scale(1)}100%{transform:scale(1.06) translate(-1%,1%)}}
 
-@keyframes fadeIn{
-  to{
-    opacity:1;
-    transform:translateY(0);
-  }
+/* ── INSTALL BANNER ── */
+#install-banner{
+  position:fixed;bottom:0;left:0;right:0;z-index:8000;
+  background:rgba(7,9,13,0.96);border-top:1px solid var(--gb2);
+  padding:0.9rem 1.2rem;display:none;
+  align-items:center;gap:0.8rem;backdrop-filter:blur(20px);
 }
+#install-banner.show{display:flex}
+.install-icon{width:42px;height:42px;border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:0.7rem;letter-spacing:0.2em;color:var(--gold);flex-shrink:0}
+.install-text{flex:1;font-size:0.72rem;color:var(--w2);line-height:1.5}
+.install-text strong{color:var(--w)}
+.install-btn{padding:0.5rem 1rem;background:linear-gradient(90deg,var(--gold),var(--copper));color:rgba(7,9,13,0.95);border:none;font-family:'Montserrat',sans-serif;font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;font-weight:500;flex-shrink:0}
+.install-close{color:var(--w3);cursor:pointer;padding:0.3rem;font-size:1rem;flex-shrink:0}
 
-.logo{
-  font-size:2rem;
-  letter-spacing:0.5em;
-  color:#C49A3C;
-  margin-bottom:1.5rem;
-}
+/* ── COOKIE ── */
+#cookie-bar{position:fixed;bottom:0;left:0;right:0;z-index:9000;
+  background:var(--glass2);border-top:1px solid var(--gb2);
+  padding:0.9rem 1.2rem;display:none;align-items:center;gap:0.8rem;flex-wrap:wrap;backdrop-filter:blur(20px)}
+#cookie-bar.show{display:flex}
+#cookie-bar p{font-size:0.7rem;color:var(--w2);flex:1;line-height:1.6}
+.cb-a{padding:0.45rem 1rem;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;font-family:'Montserrat',sans-serif;cursor:pointer;border:none;font-weight:500}
+.cb-yes{background:linear-gradient(90deg,var(--gold),var(--copper));color:rgba(7,9,13,0.95)}
+.cb-no{background:var(--w4);border:1px solid var(--gb);color:var(--w3)}
 
-/* Congo flag line */
-.flag-line{
-  width:180px;
-  height:3px;
-  margin:0 auto 1.5rem auto;
-  background:linear-gradient(
-    90deg,
-    #00A3E0 0%,
-    #00A3E0 30%,
-    #FFD100 45%,
-    #CE1126 50%,
-    #FFD100 55%,
-    #00A3E0 70%,
-    #00A3E0 100%
-  );
-  border-radius:2px;
-  box-shadow:0 0 8px rgba(255,209,0,0.4),
-             0 0 12px rgba(206,17,38,0.3);
-}
+/* ── LANDING ── */
+#landing{position:fixed;inset:0;z-index:1100;display:none;flex-direction:column;align-items:center;
+  background:rgba(7,9,13,0.97);backdrop-filter:blur(24px);overflow-y:auto;-webkit-overflow-scrolling:touch}
+#landing.show{display:flex}
+.land-inner{width:100%;max-width:480px;padding:2.5rem 1.5rem 6rem;display:flex;flex-direction:column;align-items:center;gap:1.6rem}
+.land-logo{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:2.8rem;letter-spacing:0.55em;color:var(--w);text-align:center}
+.land-logo em{color:var(--gold);font-style:normal}
+.land-tag{font-size:0.56rem;letter-spacing:0.45em;text-transform:uppercase;color:var(--gold)}
+.land-flag{display:flex;gap:0;margin:-0.8rem 0 0}
+.land-flag div{height:2.5px;width:30px}
+.land-hero{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:1.7rem;line-height:1.25;color:var(--w);text-align:center;max-width:360px}
+.land-hero em{color:var(--gold);font-style:italic}
+.land-intro{width:100%;background:rgba(196,154,60,0.06);border:1px solid var(--gb);padding:1.2rem}
+.land-intro-title{font-size:0.52rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--gold);margin-bottom:0.7rem}
+.land-intro-body{font-size:0.8rem;color:var(--w2);line-height:1.85}
+.land-intro-body strong{color:var(--w)}
+.land-nav-preview{display:flex;justify-content:space-around;width:100%;padding:0.8rem 0;border-top:1px solid var(--gb);border-bottom:1px solid var(--gb)}
+.lnp-item{display:flex;flex-direction:column;align-items:center;gap:0.25rem}
+.lnp-ic{font-size:1.2rem}
+.lnp-lbl{font-size:0.48rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--w3)}
+.live-pill{display:flex;align-items:center;gap:0.5rem;background:rgba(196,154,60,0.08);border:1px solid var(--gb2);padding:0.5rem 1rem;font-size:0.7rem;color:var(--w)}
+.live-pill .pulse{width:6px;height:6px;border-radius:50%;background:var(--grn);box-shadow:0 0 8px var(--grn);flex-shrink:0;animation:pu 2s infinite}
+@keyframes pu{0%,100%{opacity:1}50%{opacity:0.3}}
+.exchange-pill{display:flex;align-items:center;gap:0.8rem;background:rgba(8,10,14,0.6);border:1px solid var(--gb);padding:0.6rem 1rem;width:100%}
+.ep-label{font-size:0.55rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--w3);flex:1}
+.ep-rate{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--gold);line-height:1}
+.ep-sub{font-size:0.58rem;color:var(--w3)}
+.testi{background:var(--glass);border:1px solid var(--gb);padding:1rem;display:flex;gap:0.8rem}
+.testi-av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:500;flex-shrink:0}
+.testi-stars{color:var(--gold);font-size:0.62rem;margin:0.3rem 0}
+.testi-q{font-size:0.72rem;color:var(--w2);line-height:1.65;font-style:italic}
+.tier-table{width:100%;background:var(--glass);border:1px solid var(--gb)}
+.tt-head{display:grid;grid-template-columns:1.8fr 0.8fr 0.9fr 1fr;background:rgba(196,154,60,0.06)}
+.tt-row{display:grid;grid-template-columns:1.8fr 0.8fr 0.9fr 1fr;border-top:1px solid rgba(196,154,60,0.08)}
+.tt-cell{padding:0.5rem 0.4rem;font-size:0.62rem;color:var(--w2);display:flex;align-items:center;justify-content:center;text-align:center}
+.tt-cell.lbl{justify-content:flex-start;padding-left:0.8rem;font-size:0.68rem;color:var(--w)}
+.tt-cell.hd{font-size:0.52rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--w3)}
+.tt-cell.hd.gold{color:var(--gold)}
+.tt-cell.hd.blue{color:var(--blue)}
+.tt-cell.ok{color:var(--gold)}
+.tt-cell.no{color:rgba(237,232,220,0.2)}
+.land-cta{width:100%;display:flex;flex-direction:column;gap:0.6rem}
+.cta-main{width:100%;padding:1rem;background:linear-gradient(90deg,var(--gold),var(--copper));color:rgba(7,9,13,0.95);font-family:'Montserrat',sans-serif;font-size:0.7rem;letter-spacing:0.22em;text-transform:uppercase;cursor:pointer;border:none;font-weight:500;box-shadow:0 4px 28px rgba(196,154,60,0.35);transition:all 0.3s}
+.cta-main:hover{opacity:0.9;box-shadow:0 6px 36px rgba(196,154,60,0.5)}
+.cta-sub{font-size:0.63rem;color:var(--w3);text-align:center}
+.cta-sub strong{color:var(--w2)}
+.cta-links{font-size:0.58rem;color:var(--w3);text-align:center}
+.cta-links span{color:var(--gold);cursor:pointer;text-decoration:underline}
 
-p{
-  color:rgba(237,232,220,0.5);
-  font-size:0.8rem;
-  letter-spacing:0.2em;
-}
+/* ── LOGIN ── */
+#login-screen{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;background:rgba(7,9,13,0.97);backdrop-filter:blur(24px);padding:1rem}
+#login-screen.show{display:flex}
+.login-box{width:100%;max-width:380px;padding:2.5rem 2rem;background:rgba(8,10,14,0.75);border:1px solid var(--gb);backdrop-filter:blur(28px);display:flex;flex-direction:column;align-items:center;gap:1.4rem;position:relative}
+.login-box::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.login-logo{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:2.2rem;letter-spacing:0.5em;color:var(--w);text-align:center}
+.login-logo em{color:var(--gold);font-style:normal}
+.login-sub{font-size:0.56rem;letter-spacing:0.38em;text-transform:uppercase;color:var(--w3);margin-top:-1rem}
+.login-hr{width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--gb2),transparent)}
+.login-tabs{display:flex;width:100%;border:1px solid var(--gb)}
+.ltab{flex:1;padding:0.6rem;text-align:center;font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--w3);cursor:pointer;transition:all 0.25s;font-family:'Montserrat',sans-serif}
+.ltab.on{background:rgba(196,154,60,0.1);color:var(--gold)}
+.login-field{width:100%;display:flex;flex-direction:column;gap:0.38rem}
+.login-lbl{font-size:0.56rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--w3)}
+.login-inp{width:100%;background:var(--w4);border:1px solid var(--gb);padding:0.72rem 0.9rem;color:var(--w);font-family:'Montserrat',sans-serif;font-size:0.82rem;outline:none;transition:border-color 0.25s;-webkit-appearance:none}
+.login-inp:focus{border-color:var(--gb2)}
+.login-inp::placeholder{color:var(--w3)}
+.login-btn{width:100%;padding:0.88rem;background:linear-gradient(90deg,var(--gold),var(--copper));border:none;color:rgba(7,9,13,0.95);font-family:'Montserrat',sans-serif;font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;cursor:pointer;font-weight:500;transition:opacity 0.25s}
+.login-btn:hover{opacity:0.88}
+.login-err{font-size:0.7rem;color:var(--red);text-align:center;display:none}
+.login-err.on{display:block}
+.login-note{font-size:0.6rem;color:var(--w3);text-align:center}
+.login-note span{color:var(--gold);cursor:pointer}
+
+/* ── APP SHELL ── */
+#app{position:fixed;inset:0;display:flex;flex-direction:column;z-index:10;opacity:0;pointer-events:none;transition:opacity 0.5s}
+#app.on{opacity:1;pointer-events:all}
+#topbar{height:var(--top);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 1.2rem;background:rgba(7,9,13,0.92);border-bottom:1px solid var(--gb);backdrop-filter:blur(24px);z-index:100}
+.tb-logo{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:1.22rem;letter-spacing:0.45em;color:var(--w);user-select:none;line-height:1}
+.tb-logo em{color:var(--gold);font-style:normal}
+.tb-logo small{display:block;font-family:'Montserrat',sans-serif;font-size:0.4rem;letter-spacing:0.32em;text-transform:uppercase;color:var(--w3);margin-top:1px}
+.tb-search{display:flex;align-items:center;gap:0.5rem;background:var(--w4);border:1px solid var(--gb);padding:0.36rem 0.85rem;width:180px}
+.tb-search input{background:none;border:none;outline:none;font-family:'Montserrat',sans-serif;font-size:0.72rem;color:var(--w2);width:100%}
+.tb-search input::placeholder{color:var(--w3)}
+.tb-icons{display:flex;align-items:center;gap:0.45rem}
+.tic{width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:var(--w4);border:1px solid var(--gb);cursor:pointer;font-size:0.9rem;transition:all 0.25s;position:relative;flex-shrink:0}
+.tic:hover{border-color:var(--gb2);background:rgba(196,154,60,0.08)}
+.tic .ndot{position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%;background:var(--gold);border:1.5px solid #07090D}
+.tb-av{width:34px;height:34px;border-radius:50%;background:rgba(196,154,60,0.12);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:0.68rem;font-weight:500;color:var(--gold);cursor:pointer;overflow:hidden;flex-shrink:0}
+.tb-av img{width:100%;height:100%;object-fit:cover}
+
+#body{display:flex;flex:1;overflow:hidden;min-height:0;position:relative;z-index:10}
+#lnav{width:var(--nav);flex-shrink:0;background:rgba(7,9,13,0.82);border-right:1px solid var(--gb);backdrop-filter:blur(24px);display:flex;flex-direction:column;align-items:center;padding:0.7rem 0;gap:0.2rem;overflow:hidden}
+.nb{width:50px;height:50px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.18rem;cursor:pointer;position:relative;transition:background 0.25s;border-radius:var(--radius)}
+.nb:hover{background:rgba(196,154,60,0.07)}
+.nb.on{background:rgba(196,154,60,0.12)}
+.nb-ic{font-size:1.1rem;filter:grayscale(1) brightness(0.4);transition:filter 0.25s}
+.nb:hover .nb-ic,.nb.on .nb-ic{filter:none}
+.nb-lbl{font-size:0.4rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--w3);transition:color 0.25s}
+.nb.on .nb-lbl{color:var(--gold)}
+.nb .ndot{position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%;background:var(--gold);border:1.5px solid #07090D;animation:np 2s infinite}
+@keyframes np{0%,100%{box-shadow:0 0 0 0 rgba(196,154,60,0.5)}50%{box-shadow:0 0 0 4px rgba(196,154,60,0)}}
+#lnav-foot{margin-top:auto;padding-bottom:0.5rem}
+.lav{width:36px;height:36px;border-radius:50%;background:rgba(196,154,60,0.12);border:1.5px solid rgba(196,154,60,0.4);display:flex;align-items:center;justify-content:center;font-size:0.66rem;font-weight:500;color:var(--gold);cursor:pointer;overflow:hidden}
+.lav img{width:100%;height:100%;object-fit:cover}
+
+#main{flex:1;min-width:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scroll-behavior:smooth}
+#main::-webkit-scrollbar{width:2px}
+#main::-webkit-scrollbar-thumb{background:var(--gb)}
+.page{display:none;min-height:100%;animation:fadeIn 0.3s ease}
+.page.on{display:block}
+#pg-messages{display:none}
+#pg-messages.on{display:flex;height:100%}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+#rpanel{width:236px;flex-shrink:0;background:rgba(7,9,13,0.82);border-left:1px solid var(--gb);backdrop-filter:blur(24px);overflow-y:auto}
+#rpanel::-webkit-scrollbar{width:2px}
+#rpanel::-webkit-scrollbar-thumb{background:var(--gb)}
+
+#botnav{display:none;position:relative;z-index:200;height:var(--bot);flex-shrink:0;background:rgba(7,9,13,0.97);border-top:1px solid var(--gb);backdrop-filter:blur(24px);align-items:center;justify-content:space-around;padding-bottom:env(safe-area-inset-bottom)}
+.bn{display:flex;flex-direction:column;align-items:center;gap:0.2rem;cursor:pointer;padding:0.5rem 0.6rem;flex:1;transition:all 0.25s;position:relative}
+.bn-ic{font-size:1.25rem;filter:grayscale(1) brightness(0.4);transition:filter 0.25s}
+.bn.on .bn-ic{filter:none}
+.bn-lbl{font-size:0.4rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--w3);transition:color 0.25s}
+.bn.on .bn-lbl{color:var(--gold)}
+.bn .ndot{position:absolute;top:4px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--gold);border:1.5px solid #07090D;animation:np 2s infinite}
+
+@media(max-width:900px){#rpanel{display:none}}
+@media(max-width:680px){#lnav{display:none}#botnav{display:flex}.tb-search{display:none}}
+@media(min-width:681px){#botnav{display:none!important}}
+
+/* ── COMMON COMPONENTS ── */
+.card{background:var(--glass);border:1px solid var(--gb);backdrop-filter:blur(20px);transition:border-color 0.3s,box-shadow 0.3s}
+.card:hover{border-color:var(--gb2);box-shadow:0 4px 24px rgba(0,0,0,0.4)}
+.av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:500;flex-shrink:0;overflow:hidden}
+.av img{width:100%;height:100%;object-fit:cover}
+.av1{background:rgba(196,154,60,0.15);color:var(--gold);border:1px solid rgba(196,154,60,0.25)}
+.av2{background:rgba(91,141,239,0.15);color:#7AAAF5;border:1px solid rgba(91,141,239,0.22)}
+.av3{background:rgba(76,175,125,0.15);color:#5DC98C;border:1px solid rgba(76,175,125,0.22)}
+.av4{background:rgba(200,100,80,0.15);color:#E8887A;border:1px solid rgba(200,100,80,0.22)}
+.av5{background:rgba(150,100,200,0.15);color:#C49AE8;border:1px solid rgba(150,100,200,0.22)}
+.tier{font-size:0.46rem;letter-spacing:0.1em;padding:0.1rem 0.38rem}
+.te{background:rgba(196,154,60,0.12);color:var(--gold)}
+.tm{background:rgba(91,141,239,0.1);color:#7AAAF5}
+.section-feed{max-width:540px;margin:0 auto;padding:0.8rem}
+.sec-lbl{font-size:0.5rem;letter-spacing:0.42em;text-transform:uppercase;color:var(--gold);padding:0.5rem 0 0.3rem;display:flex;align-items:center;gap:0.5rem}
+.sec-lbl::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--gb),transparent)}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3.5rem 2rem;text-align:center;gap:0.8rem}
+.empty-ic{font-size:2.8rem;opacity:0.25}
+.empty-t{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:300;color:var(--w2)}
+.empty-s{font-size:0.72rem;color:var(--w3);line-height:1.7;max-width:240px}
+.empty-btn{font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;padding:0.55rem 1.3rem;border:1px solid var(--gb2);color:var(--gold);background:rgba(196,154,60,0.07);cursor:pointer;font-family:'Montserrat',sans-serif;margin-top:0.3rem}
+.loader{display:flex;justify-content:center;gap:0.4rem;padding:1.5rem}
+.ld{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:ldBounce 1.4s ease-in-out infinite}
+.ld:nth-child(2){animation-delay:0.2s}
+.ld:nth-child(3){animation-delay:0.4s}
+@keyframes ldBounce{0%,80%,100%{transform:scale(0);opacity:0.3}40%{transform:scale(1);opacity:1}}
+
+/* ── PROGRESS BAR ── */
+.profile-progress{margin-bottom:0.8rem;background:var(--glass);border:1px solid var(--gb);padding:0.9rem 1rem;cursor:pointer}
+.pp-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem}
+.pp-title{font-size:0.68rem;color:var(--w)}
+.pp-pct{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--gold)}
+.pp-bar{width:100%;height:3px;background:rgba(237,232,220,0.08);position:relative;overflow:hidden}
+.pp-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--copper));transition:width 1s ease}
+.pp-hint{font-size:0.6rem;color:var(--w3);margin-top:0.4rem}
+
+/* ── EXCHANGE WIDGET ── */
+.exchange-widget{display:flex;gap:0.5rem;margin-bottom:0.8rem;align-items:stretch}
+.ew-card{flex:1;background:var(--glass);border:1px solid var(--gb);padding:0.7rem 0.8rem;text-align:center}
+.ew-label{font-size:0.5rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--w3);margin-bottom:0.3rem}
+.ew-rate{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--gold);line-height:1}
+.ew-sub{font-size:0.55rem;color:var(--w3);margin-top:0.2rem}
+.ew-trend{font-size:0.55rem;margin-top:0.2rem}
+.ew-up{color:var(--grn)}
+.ew-down{color:var(--red)}
+
+/* ── MOMENTS (Stories) ── */
+#moments-bar{display:flex;gap:0.8rem;padding:0.8rem 1rem;overflow-x:auto;background:rgba(7,9,13,0.65);border-bottom:1px solid var(--gb);flex-shrink:0}
+#moments-bar::-webkit-scrollbar{display:none}
+.moment-item{display:flex;flex-direction:column;align-items:center;gap:0.3rem;cursor:pointer;flex-shrink:0;transition:transform 0.2s}
+.moment-item:hover{transform:scale(1.05)}
+.moment-ring{width:54px;height:54px;border-radius:50%;padding:2.5px;background:conic-gradient(var(--gold) 0%,var(--copper) 40%,#7A4A10 70%,var(--gold) 100%);transition:box-shadow 0.25s}
+.moment-ring:hover{box-shadow:0 0 16px rgba(196,154,60,0.4)}
+.moment-ring.seen{background:rgba(237,232,220,0.12)}
+.moment-ring.add-new{background:var(--w4);border:1.5px dashed rgba(237,232,220,0.25)}
+.moment-av{width:100%;height:100%;border-radius:50%;background:#0A0C10;border:2px solid #07090D;display:flex;align-items:center;justify-content:center;font-size:0.82rem;font-weight:500;overflow:hidden}
+.moment-av img{width:100%;height:100%;object-fit:cover}
+.moment-name{font-size:0.52rem;color:var(--w2);max-width:54px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Moment viewer */
+#moment-viewer{position:fixed;inset:0;z-index:3000;background:#000;display:none;flex-direction:column}
+#moment-viewer.show{display:flex}
+.mv-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.mv-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:2rem;gap:1rem}
+.mv-progress{position:absolute;top:0;left:0;right:0;display:flex;gap:3px;padding:0.8rem 1rem 0}
+.mv-prog-bar{flex:1;height:2px;background:rgba(255,255,255,0.2);overflow:hidden}
+.mv-prog-fill{height:100%;background:white;transition:width linear}
+.mv-header{position:absolute;top:1.5rem;left:1rem;right:1rem;display:flex;align-items:center;gap:0.6rem;z-index:3}
+.mv-close{position:absolute;top:1rem;right:1rem;color:white;font-size:1.5rem;cursor:pointer;z-index:4;background:none;border:none;padding:0.5rem}
+.mv-emoji{font-size:5rem;animation:bounceIn 0.4s cubic-bezier(.17,.67,.35,1.4)}
+@keyframes bounceIn{from{transform:scale(0.3)}to{transform:scale(1)}}
+.mv-text{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;color:white;text-align:center;text-shadow:0 2px 20px rgba(0,0,0,0.5);max-width:300px;line-height:1.3}
+.mv-author{font-size:0.7rem;color:rgba(255,255,255,0.7);margin-top:1rem}
+
+/* Moment creator */
+#moment-creator{position:fixed;inset:0;z-index:2500;background:rgba(7,9,13,0.97);backdrop-filter:blur(24px);display:none;flex-direction:column;align-items:center;justify-content:center;padding:2rem;gap:1.2rem}
+#moment-creator.show{display:flex}
+.mc-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300;color:var(--w)}
+.mc-emoji-grid{display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;max-width:280px}
+.mc-emoji{font-size:1.8rem;cursor:pointer;padding:0.3rem;border-radius:50%;transition:background 0.2s}
+.mc-emoji:hover,.mc-emoji.sel{background:rgba(196,154,60,0.15)}
+.mc-inp{width:100%;max-width:320px;background:var(--w4);border:1px solid var(--gb);padding:0.8rem 1rem;color:var(--w);font-family:'Montserrat',sans-serif;font-size:0.88rem;outline:none;text-align:center}
+.mc-inp::placeholder{color:var(--w3)}
+.mc-colors{display:flex;gap:0.5rem;justify-content:center}
+.mc-color{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:border-color 0.2s}
+.mc-color.sel{border-color:white}
+.mc-btns{display:flex;gap:0.8rem;margin-top:0.5rem}
+.mc-btn{padding:0.65rem 1.5rem;font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;font-family:'Montserrat',sans-serif;cursor:pointer;border:none}
+.mc-cancel{background:var(--w4);border:1px solid var(--gb);color:var(--w3)}
+.mc-post{background:linear-gradient(90deg,var(--gold),var(--copper));color:rgba(7,9,13,0.95);font-weight:500}
+
+/* ── CREATE POST ── */
+.create-card{background:var(--glass);border:1px solid var(--gb);padding:0.9rem 1rem;margin-bottom:0.8rem}
+.create-row{display:flex;align-items:center;gap:0.7rem;margin-bottom:0.8rem}
+.create-inp{flex:1;background:var(--w4);border:1px solid var(--gb);padding:0.62rem 0.88rem;color:var(--w);font-family:'Montserrat',sans-serif;font-size:0.82rem;outline:none;transition:border-color 0.25s;-webkit-appearance:none}
+.create-inp:focus{border-color:var(--gb2)}
+.create-inp::placeholder{color:var(--w3)}
+.create-actions{display:flex;gap:0.45rem;align-items:center;flex-wrap:wrap}
+.cat-sel{background:var(--w4);border:1px solid var(--gb);color:var(--w2);font-family:'Montserrat',sans-serif;font-size:0.63rem;padding:0.4rem 0.6rem;outline:none;cursor:pointer;flex:1;-webkit-appearance:none}
+.cat-sel option{background:#0F1114}
+.post-btn{padding:0.48rem 1rem;background:linear-gradient(90deg,var(--gold),var(--copper));color:rgba(7,9,13,0.95);border:none;font-family:'Montserrat',sans-serif;font-size:0.58rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;font-weight:500}
+.media-btn{padding:0.48rem 0.7rem;background:var(--w4);border:1px solid var(--gb);color:var(--w3);cursor:pointer;font-size:0.78rem;transition:all 0.25s}
+.media-btn:hover{border-color:var(--gb2);color:var(--gold)}
+#media-input{display:none}
+.media-preview-wrap{display:none;margin-top:0.6rem;position:relative}
+.media-preview-wrap.on{display:block}
+.media-preview{width:100%;max-height:200px;object-fit:cover}
+.rm-media{position:absolute;top:0.4rem;right:0.4rem;background:rgba(7,9,13,0.75);border:1px solid var(--gb);color:var(--w3);cursor:pointer;padding:0.2rem 0.5rem;font-size:0.7rem}
+
+/* ── POST CARD ── */
+.post-card{background:var(--glass);border:1px solid var(--gb);backdrop-filter:blur(20px);margin-bottom:0.8rem;transition:border-color 0.3s}
+.post-card:hover{border-color:var(--gb2)}
+.post-head{display:flex;align-items:center;gap:0.65rem;padding:0.8rem 1rem 0.6rem}
+.pm{flex:1;min-width:0}
+.pname{font-size:0.8rem;font-weight:400;color:var(--w);display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;cursor:pointer}
+.ptime{font-size:0.57rem;color:var(--w3);margin-top:0.12rem}
+.pmore{color:var(--w3);cursor:pointer;padding:0 0.4rem;font-size:1rem}
+.post-media{width:100%;aspect-ratio:16/9;position:relative;overflow:hidden}
+.post-media.tall{aspect-ratio:4/3}
+.post-media-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.post-media-bg{position:absolute;inset:0;background-size:cover;background-position:center}
+.post-media-grd{position:absolute;inset:0;background:linear-gradient(to top,rgba(7,9,13,0.88) 0%,transparent 50%)}
+.media-loc{position:absolute;top:0.7rem;left:0.8rem;z-index:2;font-size:0.54rem;letter-spacing:0.1em;background:rgba(7,9,13,0.68);padding:0.15rem 0.5rem;color:var(--w2);border:1px solid var(--gb);backdrop-filter:blur(8px)}
+.media-cat-tag{position:absolute;bottom:0.7rem;right:0.8rem;z-index:2;font-size:0.5rem;letter-spacing:0.18em;text-transform:uppercase;background:rgba(196,154,60,0.85);color:rgba(7,9,13,0.95);padding:0.15rem 0.5rem}
+.post-body{padding:0.8rem 1rem 0.45rem;font-size:0.8rem;line-height:1.78;color:var(--w2)}
+.post-body strong{color:var(--w)}
+.post-tags{padding:0 1rem 0.5rem;display:flex;flex-wrap:wrap;gap:0.3rem}
+.ptag{font-size:0.54rem;color:var(--gold);cursor:pointer;background:rgba(196,154,60,0.06);padding:0.12rem 0.42rem;border:1px solid rgba(196,154,60,0.12);transition:background 0.2s}
+.ptag:hover{background:rgba(196,154,60,0.12)}
+.post-acts{display:flex;border-top:1px solid var(--gb)}
+.pact{display:flex;align-items:center;justify-content:center;gap:0.3rem;flex:1;padding:0.52rem;font-size:0.65rem;color:var(--w3);cursor:pointer;transition:all 0.2s;font-family:'Montserrat',sans-serif}
+.pact:hover{background:var(--w4);color:var(--w2)}
+.pact.liked{color:var(--gold)}
+
+/* ── NEWS ── */
+.news-item{display:flex;gap:0.8rem;align-items:flex-start;padding:0.85rem 1rem;border-bottom:1px solid var(--gb);cursor:pointer;transition:background 0.2s}
+.news-item:hover{background:var(--w4)}
+.news-badge{font-size:0.46rem;letter-spacing:0.18em;text-transform:uppercase;background:rgba(196,154,60,0.1);border:1px solid var(--gb2);color:var(--gold);padding:0.12rem 0.42rem;flex-shrink:0;height:fit-content;margin-top:0.2rem}
+.news-title{font-size:0.78rem;color:var(--w);line-height:1.5}
+.news-date{font-size:0.57rem;color:var(--w3);margin-top:0.25rem}
+
+/* ── URGENCY ── */
+.urgency{background:linear-gradient(90deg,rgba(196,154,60,0.1),rgba(196,131,26,0.05));border:1px solid var(--gb2);padding:0.65rem 0.9rem;display:flex;align-items:center;gap:0.7rem;margin-bottom:0.8rem;animation:urgPulse 4s ease-in-out infinite}
+@keyframes urgPulse{0%,100%{border-color:var(--gb2)}50%{border-color:rgba(196,154,60,0.42)}}
+.urg-dot{width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--gold);flex-shrink:0;animation:pu 2s infinite}
+.urg-text{flex:1;font-size:0.7rem;color:var(--w)}
+.urg-text strong{color:var(--gold)}
+
+/* ── LINGALA ── */
+.lingala-card{background:linear-gradient(135deg,rgba(196,154,60,0.08),rgba(196,131,26,0.03));border:1px solid var(--gb2);padding:1.2rem;text-align:center;position:relative;overflow:hidden;margin-bottom:0.8rem}
+.lingala-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.ling-lbl{font-size:0.52rem;letter-spacing:0.42em;text-transform:uppercase;color:var(--gold);margin-bottom:0.55rem}
+.ling-word{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:1.85rem;color:var(--w);line-height:1.2}
+.ling-word em{color:var(--gold);font-style:italic}
+.ling-trans{font-size:0.68rem;color:var(--w2);margin-top:0.55rem;font-style:italic}
+.ling-mean{font-size:0.63rem;color:var(--w3);margin-top:0.6rem;line-height:1.6}
+
+/* ── EXPLORE ── */
+.xcat{display:flex;gap:0.5rem;padding:0.8rem 0.9rem;overflow-x:auto;border-bottom:1px solid var(--gb)}
+.xcat::-webkit-scrollbar{display:none}
+.xcpill{display:flex;align-items:center;gap:0.35rem;padding:0.48rem 0.9rem;flex-shrink:0;background:var(--glass);border:1px solid var(--gb);font-size:0.63rem;color:var(--w2);cursor:pointer;transition:all 0.25s;white-space:nowrap}
+.xcpill:hover,.xcpill.on{border-color:var(--gb2);color:var(--gold);background:rgba(196,154,60,0.08)}
+.xgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:0.7rem;padding:0.8rem}
+@media(min-width:900px){.xgrid{grid-template-columns:repeat(3,1fr)}}
+.xcard{position:relative;overflow:hidden;cursor:pointer;aspect-ratio:4/3;border:1px solid var(--gb);transition:all 0.3s}
+.xcard:hover{border-color:var(--gb2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.5)}
+.xcard-bg{position:absolute;inset:0;background-size:cover;background-position:center}
+.xcard-grd{position:absolute;inset:0;background:linear-gradient(to top,rgba(7,9,13,0.94) 0%,rgba(7,9,13,0.25) 50%,transparent 100%)}
+.xcard-body{position:absolute;bottom:0;left:0;right:0;padding:0.75rem}
+.xcard-cat{font-size:0.48rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);margin-bottom:0.28rem}
+.xcard-title{font-size:0.8rem;font-weight:500;color:var(--w);line-height:1.3}
+.xcard-meta{font-size:0.56rem;color:var(--w3);margin-top:0.25rem;display:flex;gap:0.4rem}
+.xcard-badge{position:absolute;top:0.5rem;right:0.5rem;font-size:0.46rem;letter-spacing:0.15em;text-transform:uppercase;background:rgba(196,154,60,0.85);color:rgba(7,9,13,0.95);padding:0.14rem 0.42rem}
+
+/* ── NETWORK ── */
+.cpills{display:flex;flex-wrap:wrap;gap:0.4rem;padding:0.8rem 0.9rem;border-bottom:1px solid var(--gb)}
+.cpill{font-size:0.54rem;letter-spacing:0.1em;padding:0.26rem 0.65rem;border:1px solid var(--gb);color:var(--w3);cursor:pointer;background:var(--w4);transition:all 0.25s}
+.cpill:hover{border-color:var(--gb2);color:var(--w2)}
+.cpill.on{border-color:rgba(196,154,60,0.3);color:var(--gold);background:rgba(196,154,60,0.07)}
+.ngrid{display:grid;grid-template-columns:repeat(2,1fr);gap:0.7rem;padding:0.8rem}
+.nc{background:var(--glass);border:1px solid var(--gb);padding:1rem;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden}
+.nc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);transform:scaleX(0);transition:transform 0.5s}
+.nc:hover::after{transform:scaleX(1)}
+.nc:hover{border-color:var(--gb2)}
+.nc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.7rem}
+.nc-av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:500;overflow:hidden}
+.nc-av img{width:100%;height:100%;object-fit:cover}
+.nc-name{font-size:0.78rem;font-weight:400;color:var(--w)}
+.nc-role{font-size:0.62rem;color:var(--w3);margin-top:0.1rem}
+.nc-city{font-size:0.56rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);margin-top:0.12rem}
+.nc-btn{width:100%;margin-top:0.75rem;font-size:0.54rem;letter-spacing:0.15em;text-transform:uppercase;padding:0.48rem;background:var(--w4);border:1px solid var(--gb);color:var(--w3);cursor:pointer;font-family:'Montserrat',sans-serif;transition:all 0.25s}
+.nc-btn:hover{border-color:var(--gb2);color:var(--gold)}
+.nc-btn.on{background:rgba(196,154,60,0.08);border-color:rgba(196,154,60,0.3);color:var(--gold)}
+
+/* ── EVENTS ── */
+.ecard{background:var(--glass);border:1px solid rgba(196,154,60,0.2);margin-bottom:0.8rem;transition:all 0.3s;overflow:hidden}
+.ecard:hover{border-color:rgba(196,154,60,0.36);box-shadow:0 6px 28px rgba(0,0,0,0.45)}
+.e-banner{width:100%;height:120px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.e-banner-bg{position:absolute;inset:0;background-size:cover;background-position:center}
+.e-grd{position:absolute;inset:0;background:linear-gradient(to top,rgba(7,9,13,0.92) 0%,transparent 60%)}
+.e-loc{position:absolute;bottom:0.6rem;left:0.8rem;z-index:2;font-size:0.52rem;letter-spacing:0.1em;background:rgba(7,9,13,0.68);padding:0.14rem 0.48rem;color:var(--w2);border:1px solid var(--gb)}
+.e-type{position:absolute;top:0.5rem;right:0.8rem;z-index:2;font-size:0.46rem;letter-spacing:0.15em;text-transform:uppercase;background:rgba(196,154,60,0.85);color:rgba(7,9,13,0.95);padding:0.12rem 0.42rem}
+.e-body{padding:0.85rem 1rem 1rem}
+.e-lbl{font-size:0.5rem;letter-spacing:0.38em;text-transform:uppercase;color:var(--gold);margin-bottom:0.4rem}
+.e-title{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:1.22rem;letter-spacing:0.04em;color:var(--w);margin-bottom:0.4rem;line-height:1.25}
+.e-meta{font-size:0.67rem;color:var(--w3);display:flex;gap:0.7rem;flex-wrap:wrap;margin-bottom:0.85rem}
+.e-btns{display:flex;gap:0.5rem}
+.ebtn{font-size:0.56rem;letter-spacing:0.15em;text-transform:uppercase;padding:0.58rem 1.1rem;cursor:pointer;font-family:'Montserrat',sans-serif;border:none;transition:all 0.3s}
+.ebtn-gold{background:linear-gradient(90deg,var(--gold),var(--copper));color:rgba(7,9,13,0.95)}
+.ebtn-out{background:var(--w4);border:1px solid var(--gb);color:var(--w2)}
+.ebtn-out:hover{border-color:var(--gb2);color:var(--gold)}
+
+/* ── MESSAGES ── */
+.msg-list{width:240px;flex-shrink:0;border-right:1px solid var(--gb);overflow-y:auto;background:rgba(7,9,13,0.5)}
+.msg-hd{padding:0.85rem 1rem;font-size:0.5rem;letter-spacing:0.42em;text-transform:uppercase;color:var(--gold);border-bottom:1px solid var(--gb)}
+.mi{display:flex;align-items:center;gap:0.6rem;padding:0.75rem 1rem;cursor:pointer;border-bottom:1px solid var(--gb);transition:background 0.2s}
+.mi:hover,.mi.on{background:var(--w4)}
+.mi-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.63rem;font-weight:500;flex-shrink:0;position:relative;overflow:hidden}
+.mi-av img{width:100%;height:100%;object-fit:cover}
+.mi-on{position:absolute;bottom:0;right:0;width:8px;height:8px;border-radius:50%;background:var(--grn);border:1.5px solid #07090D}
+.mi-info{flex:1;min-width:0}
+.mi-name{font-size:0.75rem;font-weight:400;color:var(--w)}
+.mi-prev{font-size:0.6rem;color:var(--w3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:0.1rem}
+.mi-time{font-size:0.54rem;color:var(--w3)}
+.mi-unread{width:16px;height:16px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--copper));display:flex;align-items:center;justify-content:center;font-size:0.54rem;color:rgba(7,9,13,0.95);font-weight:500}
+.chat-area{flex:1;display:flex;flex-direction:column;min-width:0}
+.chat-hd{padding:0.8rem 1rem;border-bottom:1px solid var(--gb);display:flex;align-items:center;gap:0.65rem;background:rgba(7,9,13,0.65);backdrop-filter:blur(16px);flex-shrink:0}
+.chat-name{font-size:0.78rem;font-weight:400;color:var(--w)}
+.chat-status{font-size:0.57rem;color:var(--grn);margin-top:0.1rem}
+.chat-body{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:0.65rem}
+.bubble{max-width:72%;padding:0.62rem 0.88rem;font-size:0.77rem;line-height:1.65;font-family:'Montserrat',sans-serif}
+.bubble.them{background:rgba(237,232,220,0.06);border:1px solid var(--gb);color:var(--w2);align-self:flex-start}
+.bubble.me{background:rgba(196,154,60,0.1);border:1px solid rgba(196,154,60,0.22);color:var(--w);align-self:flex-end}
+.b-time{font-size:0.52rem;color:var(--w3);margin-top:0.25rem}
+.chat-in{padding:0.72rem 1rem;border-top:1px solid var(--gb);display:flex;gap:0.5rem;background:rgba(7,9,13,0.65);flex-shrink:0}
+.chat-input{flex:1;background:var(--w4);border:1px solid var(--gb);padding:0.52rem 0.85rem;color:var(--w);font-family:'Montserrat',sans-serif;font-size:0.77rem;outline:none;transition:border-color 0.25s;-webkit-appearance:none}
+.chat-input:focus{border-color:rgba(196,154,60,0.3)}
+.send-btn{padding:0.52rem 1rem;background:linear-gradient(90deg,var(--gold),var(--copper));border:none;color:rgba(7,9,13,0.95);font-family:'Montserrat',sans-serif;font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer}
+
+/* ── RIGHT PANEL ── */
+.rp-sec{padding:0.9rem 1rem;border-bottom:1px solid var(--gb)}
+.rp-title{font-size:0.5rem;letter-spacing:0.42em;text-transform:uppercase;color:var(--gold);margin-bottom:0.8rem;display:flex;align-items:center;gap:0.5rem}
+.rp-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--gb),transparent)}
+.rm{display:flex;align-items:center;gap:0.55rem;padding:0.38rem 0;cursor:pointer}
+.rm-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.58rem;font-weight:500;flex-shrink:0;position:relative;overflow:hidden}
+.rm-av img{width:100%;height:100%;object-fit:cover}
+.rm-on{position:absolute;bottom:0;right:0;width:7px;height:7px;border-radius:50%;background:var(--grn);border:1.5px solid #07090D}
+.rm-name{font-size:0.7rem;color:var(--w);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color 0.2s}
+.rm:hover .rm-name{color:var(--gold)}
+.rc-btn{font-size:0.48rem;letter-spacing:0.1em;padding:0.2rem 0.52rem;background:var(--w4);border:1px solid var(--gb);color:var(--w3);cursor:pointer;transition:all 0.25s;font-family:'Montserrat',sans-serif}
+.rc-btn:hover,.rc-btn.on{border-color:var(--gb2);color:var(--gold)}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--gb)}
+.sc{background:rgba(7,9,13,0.75);padding:0.65rem;text-align:center}
+.sn{font-family:'Cormorant Garamond',serif;font-size:1.45rem;font-weight:300;line-height:1;background:linear-gradient(135deg,var(--gold),var(--copper));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sl{font-size:0.46rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--w3);margin-top:0.2rem}
+.trend-item{display:flex;align-items:center;gap:0.55rem;padding:0.42rem 0;border-bottom:1px solid var(--gb);cursor:pointer;transition:padding-left 0.2s}
+.trend-item:last-child{border-bottom:none}
+.trend-item:hover{padding-left:4px}
+.trend-item:hover .trend-text{color:var(--gold)}
+.trend-num{font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--w3);width:14px;text-align:center;flex-shrink:0}
+.trend-text{font-size:0.68rem;color:var(--w2);transition:color 0.2s;flex:1}
+.trend-cnt{font-size:0.54rem;color:var(--w3)}
+
+/* ── PROFILE MODAL ── */
+#profile-modal{position:fixed;inset:0;z-index:2000;background:rgba(7,9,13,0.9);backdrop-filter:blur(18px);display:none;align-items:center;justify-content:center;padding:1rem}
+#profile-modal.show{display:flex}
+.prof-box{background:rgba(8,10,14,0.98);border:1px solid var(--gb2);width:100%;max-width:400px;position:relative;overflow:hidden;animation:slideUp 0.35s cubic-bezier(.16,1,.3,1)}
+.prof-banner{height:100px;position:relative;background:linear-gradient(135deg,#060A14,#0A140A)}
+.prof-banner-grd{position:absolute;inset:0;background:linear-gradient(to top,rgba(7,9,13,0.92),transparent 60%)}
+.prof-av-wrap{position:absolute;bottom:-1.3rem;left:1.2rem}
+.prof-av-lg{width:62px;height:62px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:500;border:3px solid rgba(7,9,13,0.98);overflow:hidden}
+.prof-av-lg img{width:100%;height:100%;object-fit:cover}
+.prof-close{position:absolute;top:0.8rem;right:1rem;cursor:pointer;color:var(--w3);font-size:1.2rem;z-index:2;transition:color 0.2s;background:none;border:none}
+.prof-close:hover{color:var(--w)}
+.prof-body{padding:2.2rem 1.2rem 1.5rem}
+.prof-name-row{display:flex;align-items:center;gap:0.55rem;margin-bottom:0.28rem;flex-wrap:wrap}
+.prof-name{font-size:1.1rem;font-weight:500;color:var(--w)}
+.prof-loc{font-size:0.68rem;color:var(--w3);margin-bottom:0.55rem}
+.prof-bio{font-size:0.78rem;color:var(--w2);line-height:1.72;margin-bottom:0.9rem;font-style:italic}
+.prof-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--gb);margin-bottom:1.1rem}
+.pstat{background:var(--glass);padding:0.55rem;text-align:center}
+.pstat-n{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--gold);line-height:1}
+.pstat-l{font-size:0.48rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--w3);margin-top:0.18rem}
+.prof-actions{display:flex;gap:0.55rem}
+.prof-btn{flex:1;padding:0.62rem;font-size:0.58rem;letter-spacing:0.18em;text-transform:uppercase;font-family:'Montserrat',sans-serif;cursor:pointer;border:none;transition:all 0.25s}
+.prof-btn-gold{background:linear-gradient(90deg,var(--gold),var(--copper));color:rgba(7,9,13,0.95);font-weight:500}
+.prof-btn-out{background:var(--w4);border:1px solid var(--gb);color:var(--w2)}
+.prof-btn-out:hover{border-color:var(--gb2);color:var(--gold)}
+
+/* ── MY PROFILE ── */
+#my-profile{position:fixed;inset:0;z-index:2000;background:rgba(7,9,13,0.9);backdrop-filter:blur(18px);display:none;align-items:center;justify-content:center;padding:1rem;overflow-y:auto}
+#my-profile.show{display:flex}
+.myp-box{background:rgba(8,10,14,0.98);border:1px solid var(--gb2);width:100%;max-width:420px;padding:2rem 1.5rem;position:relative;animation:slideUp 0.35s cubic-bezier(.16,1,.3,1)}
+.myp-box::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.myp-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:300;margin-bottom:1.4rem;text-align:center}
+.myp-av-section{display:flex;flex-direction:column;align-items:center;gap:0.7rem;margin-bottom:1.4rem}
+.myp-av{width:80px;height:80px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:500;color:var(--gold);background:rgba(196,154,60,0.1);overflow:hidden;cursor:pointer}
+.myp-av img{width:100%;height:100%;object-fit:cover}
+.myp-av-btn{font-size:0.58rem;letter-spacing:0.15em;color:var(--gold);cursor:pointer;text-decoration:underline}
+#avatar-input{display:none}
+.myp-field{margin-bottom:0.9rem}
+.myp-lbl{font-size:0.56rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--w3);margin-bottom:0.38rem;display:block}
+.myp-inp{width:100%;background:var(--w4);border:1px solid var(--gb);padding:0.68rem 0.88rem;color:var(--w);font-family:'Montserrat',sans-serif;font-size:0.82rem;outline:none;transition:border-color 0.25s;-webkit-appearance:none}
+.myp-inp:focus{border-color:var(--gb2)}
+.myp-inp::placeholder{color:var(--w3)}
+.myp-save{width:100%;margin-top:0.4rem;padding:0.85rem;background:linear-gradient(90deg,var(--gold),var(--copper));border:none;color:rgba(7,9,13,0.95);font-family:'Montserrat',sans-serif;font-size:0.68rem;letter-spacing:0.25em;text-transform:uppercase;cursor:pointer;font-weight:500}
+.myp-sub-btn{width:100%;margin-top:0.5rem;padding:0.58rem;background:none;border:1px solid var(--gb2);color:var(--gold);font-family:'Montserrat',sans-serif;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer}
+.myp-logout{width:100%;margin-top:0.5rem;padding:0.58rem;background:none;border:1px solid rgba(224,82,82,0.3);color:var(--red);font-family:'Montserrat',sans-serif;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer}
+.myp-close{position:absolute;top:1rem;right:1rem;cursor:pointer;color:var(--w3);font-size:1.2rem;background:none;border:none}
+
+/* ── PRIVACY / CGU ── */
+.doc-page{padding:1.5rem;max-width:680px;margin:0 auto}
+.doc-back{display:inline-flex;align-items:center;gap:0.4rem;font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);cursor:pointer;margin-bottom:1.4rem}
+.doc-h1{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;color:var(--w);margin-bottom:0.4rem}
+.doc-date{font-size:0.62rem;color:var(--w3);margin-bottom:1.8rem;letter-spacing:0.1em}
+.doc-h2{font-size:0.82rem;font-weight:500;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase;margin:1.5rem 0 0.55rem}
+.doc-p{font-size:0.8rem;color:var(--w2);line-height:1.85;margin-bottom:0.8rem}
+
+/* ── ONBOARDING ── */
+#onboarding{position:fixed;inset:0;z-index:2500;background:rgba(7,9,13,0.95);backdrop-filter:blur(24px);display:none;align-items:center;justify-content:center;padding:1rem}
+#onboarding.show{display:flex}
+.ob-box{background:rgba(8,10,14,0.98);border:1px solid var(--gb2);padding:2rem 1.5rem;max-width:420px;width:100%;text-align:center;position:relative;animation:slideUp 0.4s cubic-bezier(.16,1,.3,1)}
+.ob-box::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.ob-prog{display:flex;gap:0.4rem;justify-content:center;margin-bottom:1.5rem}
+.ob-dot{width:28px;height:3px;background:var(--w4);transition:background 0.3s}
+.ob-dot.on{background:var(--gold)}
+.ob-ic{font-size:2.5rem;margin-bottom:0.9rem}
+.ob-title{font-family:'Cormorant Garamond',serif;font-size:1.42rem;font-weight:300;margin-bottom:0.45rem}
+.ob-sub{font-size:0.78rem;color:var(--w2);line-height:1.72;margin-bottom:1.4rem}
+.ob-opts{display:flex;flex-wrap:wrap;gap:0.45rem;justify-content:center;margin-bottom:1.4rem}
+.ob-opt{padding:0.48rem 0.9rem;border:1px solid var(--gb);background:var(--w4);color:var(--w2);font-size:0.68rem;letter-spacing:0.08em;cursor:pointer;transition:all 0.25s;font-family:'Montserrat',sans-serif}
+.ob-opt:hover,.ob-opt.on{border-color:var(--gold);color:var(--gold);background:rgba(196,154,60,0.08)}
+.ob-btns{display:flex;gap:0.55rem;justify-content:center}
+.ob-btn{padding:0.62rem 1.35rem;font-size:0.58rem;letter-spacing:0.18em;text-transform:uppercase;font-family:'Montserrat',sans-serif;cursor:pointer;border:none}
+.ob-skip{background:none;border:1px solid var(--gb);color:var(--w3)}
+.ob-next{background:linear-gradient(90deg,var(--gold),var(--copper));color:rgba(7,9,13,0.95);font-weight:500}
+.ob-tour-row{display:flex;align-items:flex-start;gap:0.8rem;padding:0.55rem 0;border-bottom:1px solid var(--gb);text-align:left}
+.ob-tour-row:last-child{border-bottom:none}
+.ob-tour-ic{font-size:1.15rem;flex-shrink:0}
+.ob-tour-title{font-size:0.76rem;color:var(--w);font-weight:500}
+.ob-tour-desc{font-size:0.65rem;color:var(--w3);margin-top:0.1rem;line-height:1.55}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:1.4rem;right:1.4rem;z-index:9999;background:var(--glass2);border:1px solid var(--gb2);padding:0.78rem 1.15rem;display:flex;align-items:center;gap:0.65rem;font-size:0.7rem;color:var(--w);transform:translateY(70px);opacity:0;transition:all 0.42s cubic-bezier(.16,1,.3,1);pointer-events:none;backdrop-filter:blur(24px);box-shadow:0 8px 30px rgba(0,0,0,0.5);max-width:280px}
+#toast.show{transform:translateY(0);opacity:1}
+.tdot{width:7px;height:7px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--copper));box-shadow:0 0 8px rgba(196,154,60,0.5);flex-shrink:0}
+
+@keyframes slideUp{from{transform:translateY(28px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* ── THUMB BACKGROUNDS ── */
+.bg-jazz{background:radial-gradient(ellipse 60% 60% at 30% 40%,#1A3A5C 0%,transparent 65%),linear-gradient(160deg,#0D1F35,#111A0E)}
+.bg-sape{background:radial-gradient(ellipse 55% 55% at 65% 35%,#2A1A08 0%,transparent 60%),linear-gradient(135deg,#1C1006,#0E0808)}
+.bg-concert{background:radial-gradient(ellipse 70% 60% at 50% 30%,#3D1A0A 0%,transparent 60%),linear-gradient(160deg,#2A1206,#14100A)}
+.bg-biz{background:radial-gradient(ellipse 55% 55% at 70% 50%,#0A1A2E 0%,transparent 60%),linear-gradient(135deg,#060E1A,#0A140A)}
+.bg-goma{background:radial-gradient(ellipse 60% 60% at 40% 40%,#1A0A1A 0%,transparent 60%),linear-gradient(160deg,#120A18,#0A160E)}
+.bg-food{background:radial-gradient(ellipse 65% 55% at 50% 40%,#2A1008 0%,transparent 60%),linear-gradient(135deg,#1E0E06,#160A04)}
+.bg-kinshasa{background:radial-gradient(ellipse 60% 60% at 50% 30%,#0A2A1A 0%,transparent 60%),linear-gradient(160deg,#051A10,#0A1006)}
+.bg-culture{background:radial-gradient(ellipse 55% 55% at 35% 45%,#1A1004 0%,transparent 60%),linear-gradient(135deg,#120A02,#0E0804)}
 </style>
 </head>
 <body>
-<div class="box">
-  <div class="logo">KINOI.S</div>
-  <div class="flag-line"></div>
-  <p>LANCEMENT BIENTÔT — LE PREMIER HUB DIGITAL DE LA DIASPORA CONGOLAISE</p>
+<div id="bg-layer"></div>
+
+<!-- INSTALL BANNER -->
+<div id="install-banner">
+  <div class="install-icon">K.S</div>
+  <div class="install-text"><strong>Installe KINOI.S</strong><br/>Ajoute l'app à ton écran d'accueil</div>
+  <button class="install-btn" id="install-btn" onclick="installApp()">Installer</button>
+  <div class="install-close" onclick="document.getElementById('install-banner').classList.remove('show')">✕</div>
 </div>
+
+<!-- COOKIE -->
+<div id="cookie-bar">
+  <p>KINOI.S utilise des cookies essentiels. En continuant, tu acceptes notre <span onclick="showPrivacy()" style="color:var(--gold);cursor:pointer">politique de confidentialité</span>.</p>
+  <button class="cb-a cb-no" onclick="dismissCookie()">Refuser</button>
+  <button class="cb-a cb-yes" onclick="acceptCookie()">Accepter</button>
+</div>
+
+<!-- LANDING -->
+<div id="landing" class="show">
+  <div class="land-inner">
+    <div class="land-tag">Réseau Digital · Diaspora Congolaise</div>
+    <div class="land-logo">KINOI<em>.</em>S</div>
+    <div class="land-flag">
+      <div style="background:#007FFF"></div>
+      <div style="background:#FCD116"></div>
+      <div style="background:#CE1021"></div>
+    </div>
+    <div class="land-hero">Le réseau qui appartient<br/>à la <em>diaspora congolaise.</em></div>
+
+    <div class="land-intro">
+      <div class="land-intro-title">Qu'est-ce que KINOI.S ?</div>
+      <div class="land-intro-body">
+        KINOI.S est <strong>le premier réseau social dédié à la diaspora congolaise</strong> dans le monde entier. Partage du contenu, connecte-toi avec des professionnels Kinois près de toi, suis l'actualité du Congo en direct et participe aux events de ta communauté.<br/><br/>
+        C'est <strong>ton espace.</strong> Conçu pour toi. Par la diaspora, pour la diaspora.<br/><br/>
+        <em style="color:var(--gold);font-style:italic">Biso na biso — nous entre nous, partout dans le monde.</em>
+      </div>
+    </div>
+
+    <div class="land-nav-preview">
+      <div class="lnp-item"><div class="lnp-ic">🏠</div><div class="lnp-lbl">Feed</div></div>
+      <div class="lnp-item"><div class="lnp-ic">✨</div><div class="lnp-lbl">Moments</div></div>
+      <div class="lnp-item"><div class="lnp-ic">🔍</div><div class="lnp-lbl">Explorer</div></div>
+      <div class="lnp-item"><div class="lnp-ic">🤝</div><div class="lnp-lbl">Réseau</div></div>
+      <div class="lnp-item"><div class="lnp-ic">🎟️</div><div class="lnp-lbl">Events</div></div>
+      <div class="lnp-item"><div class="lnp-ic">💬</div><div class="lnp-lbl">Messages</div></div>
+    </div>
+
+    <div class="exchange-pill" id="land-exchange">
+      <div class="ep-label">Taux de change en direct</div>
+      <div>
+        <div class="ep-rate" id="land-rate">—</div>
+        <div class="ep-sub">1 EUR = <span id="land-cdf">…</span> CDF</div>
+      </div>
+    </div>
+
+    <div class="live-pill"><div class="pulse"></div><span>Communauté active · <strong>Biso na biso</strong></span></div>
+
+    <div class="testi"><div class="testi-av av1">AM</div><div><div style="font-size:0.75rem;font-weight:500;color:var(--w)">Aramis Mukendi</div><div style="font-size:0.58rem;color:var(--w3)">Bruxelles · Comptable</div><div class="testi-stars">★★★★★</div><div class="testi-q">"En une semaine j'ai 3 nouveaux clients. Enfin un réseau qui nous comprend vraiment."</div></div></div>
+    <div class="testi"><div class="testi-av av3">LN</div><div><div style="font-size:0.75rem;font-weight:500;color:var(--w)">Laeticia Nkosi</div><div style="font-size:0.58rem;color:var(--w3)">Paris · Marketing</div><div class="testi-stars">★★★★★</div><div class="testi-q">"J'ai recruté 2 personnes via le réseau. Biso na biso, ça fait vraiment la différence."</div></div></div>
+
+    <div class="tier-table">
+      <div class="tt-head">
+        <div class="tt-cell hd lbl">Fonctionnalité</div>
+        <div class="tt-cell hd">Libre</div>
+        <div class="tt-cell hd gold">Élite €7</div>
+        <div class="tt-cell hd blue">Makambu €19</div>
+      </div>
+      <div class="tt-row"><div class="tt-cell lbl">📰 Feed & actualités</div><div class="tt-cell ok">✓</div><div class="tt-cell ok">✓</div><div class="tt-cell ok">✓</div></div>
+      <div class="tt-row"><div class="tt-cell lbl">✨ Moments (Stories)</div><div class="tt-cell ok">✓</div><div class="tt-cell ok">✓</div><div class="tt-cell ok">✓</div></div>
+      <div class="tt-row"><div class="tt-cell lbl">🔍 Explorer</div><div class="tt-cell ok">✓</div><div class="tt-cell ok">✓</div><div class="tt-cell ok">✓</div></div>
+      <div class="tt-row"><div class="tt-cell lbl">🤝 Réseau professionnel</div><div class="tt-cell no">—</div><div class="tt-cell ok">✓</div><div class="tt-cell ok">✓</div></div>
+      <div class="tt-row"><div class="tt-cell lbl">💬 Messagerie privée</div><div class="tt-cell no">—</div><div class="tt-cell ok">✓</div><div class="tt-cell ok">✓</div></div>
+      <div class="tt-row"><div class="tt-cell lbl">⭐ Badge Élite</div><div class="tt-cell no">—</div><div class="tt-cell ok">✓</div><div class="tt-cell ok">✓</div></div>
+      <div class="tt-row"><div class="tt-cell lbl">💼 Business listing</div><div class="tt-cell no">—</div><div class="tt-cell no">—</div><div class="tt-cell ok">✓</div></div>
+      <div class="tt-row"><div class="tt-cell lbl">📈 Réseau investisseurs</div><div class="tt-cell no">—</div><div class="tt-cell no">—</div><div class="tt-cell ok">✓</div></div>
+      <div class="tt-row"><div class="tt-cell lbl">👑 Badge Makambu</div><div class="tt-cell no">—</div><div class="tt-cell no">—</div><div class="tt-cell ok">✓</div></div>
+    </div>
+
+    <div class="land-cta">
+      <button class="cta-main" onclick="showLogin()">Rejoins la diaspora congolaise — Gratuit</button>
+      <div class="cta-sub">Gratuit pour commencer · <strong>Élite €7/mois</strong> · <strong>Makambu €19/mois</strong></div>
+      <div class="cta-links">Déjà membre ? <span onclick="showLogin()">Se connecter</span> · <span onclick="showPrivacy()">Confidentialité</span> · <span onclick="showCGU()">CGU</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">KINOI<em>.</em>S</div>
+    <div class="login-sub">Congo Diaspora</div>
+    <div class="login-hr"></div>
+    <div class="login-tabs">
+      <div class="ltab on" onclick="switchTab(this,'login')">Connexion</div>
+      <div class="ltab" onclick="switchTab(this,'register')">Créer un compte</div>
+    </div>
+    <div id="lform" style="width:100%;display:flex;flex-direction:column;gap:0.88rem">
+      <div class="login-field"><div class="login-lbl">Email</div><input class="login-inp" id="l-email" type="email" placeholder="votre@email.com" autocomplete="email"/></div>
+      <div class="login-field" id="lf-name" style="display:none"><div class="login-lbl">Nom complet</div><input class="login-inp" id="l-name" type="text" placeholder="Jonathan Kabongo" autocomplete="name"/></div>
+      <div class="login-field" id="lf-city" style="display:none"><div class="login-lbl">Ville d'origine au Congo</div><input class="login-inp" id="l-city" type="text" placeholder="Kinshasa, Lubumbashi, Goma…"/></div>
+      <div class="login-field"><div class="login-lbl">Mot de passe</div><input class="login-inp" id="l-pass" type="password" placeholder="••••••••" autocomplete="current-password"/></div>
+    </div>
+    <div class="login-err" id="l-err"></div>
+    <button class="login-btn" id="l-btn" onclick="doAuth()">Se connecter</button>
+    <div class="login-note" id="l-note">Pas encore de compte ? <span onclick="switchTabByName('register')">Créer un compte gratuit</span></div>
+    <div style="font-size:0.58rem;color:var(--w3);text-align:center"><span onclick="showPrivacy()" style="cursor:pointer;text-decoration:underline">Confidentialité</span> · <span onclick="showCGU()" style="cursor:pointer;text-decoration:underline">CGU</span></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div id="topbar">
+    <div class="tb-logo">KINOI<em>.</em>S<small>Congo Diaspora</small></div>
+    <div class="tb-search"><span style="color:var(--w3);font-size:0.85rem">⌕</span><input type="text" placeholder="Rechercher…" id="search-inp"/></div>
+    <div class="tb-icons">
+      <div class="tic" onclick="go('messages')">💬<div class="ndot"></div></div>
+      <div class="tic" onclick="toast('Aucune nouvelle notification')">🔔</div>
+      <div class="tb-av" id="tb-av" onclick="showMyProfile()">?</div>
+    </div>
+  </div>
+
+  <div id="body">
+    <div id="lnav">
+      <div class="nb on" onclick="go('feed',this)"><div class="nb-ic">🏠</div><div class="nb-lbl">Feed</div></div>
+      <div class="nb" onclick="go('explore',this)"><div class="nb-ic">🔍</div><div class="nb-lbl">Explorer</div></div>
+      <div class="nb" onclick="go('network',this)"><div class="nb-ic">🤝</div><div class="nb-lbl">Réseau</div></div>
+      <div class="nb" onclick="go('events',this)"><div class="nb-ic">🎟️</div><div class="nb-lbl">Events</div></div>
+      <div class="nb" onclick="go('messages',this)"><div class="nb-ic">💬</div><div class="nb-lbl">Messages</div><div class="ndot"></div></div>
+      <div id="lnav-foot"><div class="lav" id="lnav-av" onclick="showMyProfile()">?</div></div>
+    </div>
+
+    <div id="main">
+
+      <!-- FEED -->
+      <div class="page on" id="pg-feed">
+        <div id="moments-bar">
+          <div class="moment-item" onclick="openMomentCreator()">
+            <div class="moment-ring add-new"><div class="moment-av" style="font-size:1.4rem;color:var(--w3)">＋</div></div>
+            <div class="moment-name">Moment</div>
+          </div>
+        </div>
+        <div class="section-feed">
+          <div id="progress-bar-widget" style="display:none"></div>
+          <div class="exchange-widget" id="exchange-widget">
+            <div class="ew-card">
+              <div class="ew-label">EUR → CDF</div>
+              <div class="ew-rate" id="ew-cdf">…</div>
+              <div class="ew-sub">Franc Congolais</div>
+              <div class="ew-trend" id="ew-cdf-trend"></div>
+            </div>
+            <div class="ew-card">
+              <div class="ew-label">USD → CDF</div>
+              <div class="ew-rate" id="ew-usd">…</div>
+              <div class="ew-sub">Dollar américain</div>
+              <div class="ew-trend" id="ew-usd-trend"></div>
+            </div>
+            <div class="ew-card" style="border:1px solid var(--gb2)">
+              <div class="ew-label">GBP → CDF</div>
+              <div class="ew-rate" id="ew-gbp">…</div>
+              <div class="ew-sub">Livre Sterling</div>
+              <div class="ew-trend" id="ew-gbp-trend"></div>
+            </div>
+          </div>
+          <div class="lingala-card">
+            <div class="ling-lbl">Lingala du jour</div>
+            <div class="ling-word" id="ling-word"><em>Mbote na yo</em></div>
+            <div class="ling-trans" id="ling-trans">"Bonjour à toi"</div>
+            <div class="ling-mean" id="ling-mean">La première chose qu'un Congolais apprend, où qu'il vive dans le monde.</div>
+          </div>
+          <div class="urgency"><div class="urg-dot"></div><div class="urg-text"><strong>Biso na biso</strong> — partout dans le monde</div></div>
+          <div class="create-card">
+            <div class="create-row">
+              <div class="av av1" id="create-av" style="flex-shrink:0">?</div>
+              <input class="create-inp" id="post-inp" placeholder="Partage quelque chose avec la communauté…" maxlength="500"/>
+            </div>
+            <div id="media-preview-wrap" class="media-preview-wrap">
+              <img id="media-preview" class="media-preview" src="" alt=""/>
+              <button class="rm-media" onclick="removeMedia()">✕</button>
+            </div>
+            <div class="create-actions">
+              <select class="cat-sel" id="post-cat">
+                <option value="">Catégorie…</option>
+                <option value="musique">🎵 Musique</option>
+                <option value="sape">👔 SAPE</option>
+                <option value="business">💼 Business</option>
+                <option value="culture">🌍 Culture</option>
+                <option value="actualites">📡 Actualités</option>
+                <option value="gastronomie">🍽️ Gastronomie</option>
+                <option value="sport">⚽ Sport</option>
+                <option value="events">🎟️ Events</option>
+              </select>
+              <button class="media-btn" onclick="document.getElementById('media-input').click()">📷</button>
+              <input type="file" id="media-input" accept="image/*" onchange="handleMedia(event)"/>
+              <button class="post-btn" onclick="createPost()">Publier</button>
+            </div>
+          </div>
+          <div id="feed-posts"><div class="loader"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div></div>
+          <div class="sec-lbl">📡 Actualités Congo en direct</div>
+          <div id="news-feed"><div class="loader"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div></div>
+        </div>
+      </div>
+
+      <!-- EXPLORE -->
+      <div class="page" id="pg-explore">
+        <div class="xcat">
+          <div class="xcpill on" onclick="xcFilter(this,'all')">✦ Tout</div>
+          <div class="xcpill" onclick="xcFilter(this,'musique')">🎵 Musique</div>
+          <div class="xcpill" onclick="xcFilter(this,'sape')">👔 SAPE</div>
+          <div class="xcpill" onclick="xcFilter(this,'business')">💼 Business</div>
+          <div class="xcpill" onclick="xcFilter(this,'culture')">🌍 Culture</div>
+          <div class="xcpill" onclick="xcFilter(this,'actualites')">📡 Actualités</div>
+          <div class="xcpill" onclick="xcFilter(this,'gastronomie')">🍽️ Gastro</div>
+          <div class="xcpill" onclick="xcFilter(this,'sport')">⚽ Sport</div>
+        </div>
+        <div id="xgrid" class="xgrid"><div class="loader"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div></div>
+        <div id="xempty" class="empty" style="display:none"><div class="empty-ic">🔍</div><div class="empty-t">Aucun contenu ici</div><div class="empty-s">Sois le premier à poster dans cette catégorie.</div><button class="empty-btn" onclick="go('feed')">Publier un post</button></div>
+      </div>
+
+      <!-- NETWORK -->
+      <div class="page" id="pg-network">
+        <div class="cpills" id="net-pills">
+          <div class="cpill on" onclick="filterNet(this,'all')">Tous</div>
+          <div class="cpill" onclick="filterNet(this,'Bruxelles')">Bruxelles</div>
+          <div class="cpill" onclick="filterNet(this,'Paris')">Paris</div>
+          <div class="cpill" onclick="filterNet(this,'Amsterdam')">Amsterdam</div>
+          <div class="cpill" onclick="filterNet(this,'Londres')">Londres</div>
+          <div class="cpill" onclick="filterNet(this,'Montréal')">Montréal</div>
+        </div>
+        <div id="net-grid" class="ngrid"><div class="loader"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div></div>
+        <div id="net-empty" class="empty" style="display:none"><div class="empty-ic">🤝</div><div class="empty-t">Aucun membre ici</div><div class="empty-s">La communauté grandit chaque jour.</div></div>
+      </div>
+
+      <!-- EVENTS -->
+      <div class="page" id="pg-events">
+        <div class="cpills" id="ev-pills">
+          <div class="cpill on" onclick="filterEvents(this,'all')">Tous</div>
+          <div class="cpill" onclick="filterEvents(this,'bxl')">Bruxelles</div>
+          <div class="cpill" onclick="filterEvents(this,'par')">Paris</div>
+          <div class="cpill" onclick="filterEvents(this,'lon')">Londres</div>
+          <div class="cpill" onclick="filterEvents(this,'ams')">Amsterdam</div>
+          <div class="cpill" onclick="filterEvents(this,'int')">International</div>
+        </div>
+        <div style="padding:0.8rem" id="events-list"></div>
+      </div>
+
+      <!-- MESSAGES -->
+      <div class="page" id="pg-messages">
+        <div class="msg-list">
+          <div class="msg-hd">Messages</div>
+          <div id="msg-list-content">
+            <div class="empty" style="padding:1.5rem"><div class="empty-ic" style="font-size:2rem">💬</div><div class="empty-t" style="font-size:1rem">Aucun message</div><div class="empty-s">Connecte-toi avec des membres.</div></div>
+          </div>
+        </div>
+        <div class="chat-area">
+          <div class="chat-hd"><div style="font-size:0.8rem;color:var(--w2)">Sélectionne une conversation</div></div>
+          <div class="chat-body" id="chatbody">
+            <div class="empty"><div class="empty-ic">✉️</div><div class="empty-t">Mbote !</div><div class="empty-s">Tes messages apparaîtront ici.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRIVACY -->
+      <div class="page" id="pg-privacy">
+        <div class="doc-page">
+          <div class="doc-back" onclick="go('feed')">← Retour</div>
+          <h1 class="doc-h1">Politique de Confidentialité</h1>
+          <div class="doc-date">Mars 2026 · © KINOI.S</div>
+          <h2 class="doc-h2">1. Responsable du traitement</h2>
+          <p class="doc-p">KINOI.S — Réseau Digital Diaspora Congolaise. Contact : <strong>privacy@kinoiss.com</strong></p>
+          <h2 class="doc-h2">2. Données collectées</h2>
+          <p class="doc-p">Nom, email, ville d'origine, biographie, photo de profil, contenus publiés (posts, moments, messages).</p>
+          <h2 class="doc-h2">3. Finalité</h2>
+          <p class="doc-p">Gestion du compte, interactions communautaires, notifications de service, amélioration de l'expérience.</p>
+          <h2 class="doc-h2">4. Base légale</h2>
+          <p class="doc-p">Consentement explicite lors de l'inscription et exécution du contrat de service.</p>
+          <h2 class="doc-h2">5. Durée de conservation</h2>
+          <p class="doc-p">Données de compte : durée de vie + 3 ans. Posts et moments : supprimés à la fermeture du compte. Messages : 2 ans après dernière activité. Données de paiement : 7 ans. Logs : 90 jours. Comptes inactifs : supprimés après 2 ans avec préavis de 30 jours.</p>
+          <h2 class="doc-h2">6. Vos droits (RGPD)</h2>
+          <p class="doc-p">Accès, rectification, effacement, portabilité, opposition. Contact : <strong>privacy@kinoiss.com</strong></p>
+          <h2 class="doc-h2">7. Actualités tierces (RSS)</h2>
+          <p class="doc-p">KINOI.S affiche des contenus de Radio Okapi, Actualité.cd, 7sur7.cd, Congo Indépendant via flux RSS publics avec bronvermelding. KINOI.S n'est pas responsable de ces contenus.</p>
+          <h2 class="doc-h2">8. Cookies</h2>
+          <p class="doc-p">Uniquement des cookies essentiels (session d'authentification). Aucun cookie publicitaire. Aucune donnée vendue à des tiers.</p>
+          <h2 class="doc-h2">9. Sécurité</h2>
+          <p class="doc-p">Les données sont stockées sur Supabase (West EU, Irlande) avec Row Level Security. Toutes les communications sont chiffrées via HTTPS/TLS.</p>
+        </div>
+      </div>
+
+      <!-- CGU -->
+      <div class="page" id="pg-cgu">
+        <div class="doc-page">
+          <div class="doc-back" onclick="go('feed')">← Retour</div>
+          <h1 class="doc-h1">Conditions Générales d'Utilisation</h1>
+          <div class="doc-date">En vigueur depuis Mars 2026</div>
+          <h2 class="doc-h2">1. Objet</h2>
+          <p class="doc-p">Les présentes CGU régissent l'utilisation de KINOI.S, réseau social dédié à la diaspora congolaise.</p>
+          <h2 class="doc-h2">2. Contenu interdit</h2>
+          <p class="doc-p">Contenus haineux, illégaux, atteintes à la vie privée, spam, désinformation.</p>
+          <h2 class="doc-h2">3. Propriété intellectuelle</h2>
+          <p class="doc-p">Tu conserves la propriété de tes contenus mais accordes à KINOI.S une licence d'affichage. L'architecture et le design de KINOI.S sont la propriété exclusive de KINOI.S.</p>
+          <h2 class="doc-h2">4. Responsabilité</h2>
+          <p class="doc-p">KINOI.S n'est pas responsable des contenus publiés par les utilisateurs. Tout contenu signalé sera examiné dans 72h.</p>
+          <h2 class="doc-h2">5. Abonnements et résiliation</h2>
+          <p class="doc-p">Les abonnements Élite (€7/mois) et Makambu (€19/mois) se renouvellent automatiquement. Droit de rétractation de 14 jours. Résiliation via Profil → "Gérer mon abonnement" ou par email à <strong>contact@kinoiss.com</strong>. Paiements traités par Paddle (Merchant of Record).</p>
+          <h2 class="doc-h2">6. Droit applicable</h2>
+          <p class="doc-p">Droit belge. Tribunaux de Bruxelles compétents. Contact : <strong>contact@kinoiss.com</strong></p>
+        </div>
+      </div>
+
+    </div><!-- /main -->
+
+    <!-- RIGHT PANEL -->
+    <div id="rpanel">
+      <div class="rp-sec">
+        <div style="background:rgba(76,175,125,0.08);border:1px solid rgba(76,175,125,0.22);padding:0.55rem 0.8rem;display:flex;align-items:center;gap:0.5rem;font-size:0.65rem;color:var(--w);margin-bottom:0.8rem">
+          <div class="pulse" style="width:6px;height:6px;border-radius:50%;background:var(--grn);box-shadow:0 0 8px var(--grn);flex-shrink:0;animation:pu 2s infinite"></div>
+          <strong id="member-count" style="color:var(--grn)">0</strong> membres KINOI.S
+        </div>
+        <div class="rp-title">En ligne</div>
+        <div id="online-members"><div class="loader"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div></div>
+      </div>
+      <div class="rp-sec">
+        <div class="rp-title">Tendances</div>
+        <div class="trend-item"><div class="trend-num">1</div><div class="trend-text">#CongoDiaspora</div></div>
+        <div class="trend-item"><div class="trend-num">2</div><div class="trend-text">#BisoBiso</div></div>
+        <div class="trend-item"><div class="trend-num">3</div><div class="trend-text">#SapeurSpotlight</div></div>
+        <div class="trend-item"><div class="trend-num">4</div><div class="trend-text">#BusinessCongo</div></div>
+        <div class="trend-item"><div class="trend-num">5</div><div class="trend-text">#KinoisApp</div></div>
+      </div>
+      <div class="rp-sec">
+        <div class="rp-title">Taux de change</div>
+        <div class="ew-card" style="border:none;padding:0">
+          <div style="font-size:0.55rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--w3);margin-bottom:0.4rem">EUR / CDF</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--gold)" id="rp-rate">…</div>
+          <div style="font-size:0.55rem;color:var(--w3);margin-top:0.2rem" id="rp-updated">Mise à jour…</div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /body -->
+
+  <!-- BOTTOM NAV -->
+  <div id="botnav">
+    <div class="bn on" onclick="go('feed',this)"><div class="bn-ic">🏠</div><div class="bn-lbl">Feed</div></div>
+    <div class="bn" onclick="go('explore',this)"><div class="bn-ic">🔍</div><div class="bn-lbl">Explorer</div></div>
+    <div class="bn" onclick="go('network',this)"><div class="bn-ic">🤝</div><div class="bn-lbl">Réseau</div></div>
+    <div class="bn" onclick="go('events',this)"><div class="bn-ic">🎟️</div><div class="bn-lbl">Events</div></div>
+    <div class="bn" onclick="go('messages',this)"><div class="bn-ic">💬</div><div class="bn-lbl">Messages</div><div class="ndot"></div></div>
+  </div>
+</div><!-- /app -->
+
+<!-- MOMENT VIEWER -->
+<div id="moment-viewer">
+  <div class="mv-bg" id="mv-bg"></div>
+  <div class="mv-progress" id="mv-progress"></div>
+  <button class="mv-close" onclick="closeMomentViewer()">✕</button>
+  <div class="mv-header" id="mv-header"></div>
+  <div class="mv-content">
+    <div class="mv-emoji" id="mv-emoji"></div>
+    <div class="mv-text" id="mv-text"></div>
+    <div class="mv-author" id="mv-author"></div>
+  </div>
+</div>
+
+<!-- MOMENT CREATOR -->
+<div id="moment-creator">
+  <div class="mc-title">Nouveau Moment</div>
+  <div class="mc-emoji-grid">
+    <span class="mc-emoji" onclick="selMomentEmoji(this,'🇨🇩')">🇨🇩</span>
+    <span class="mc-emoji" onclick="selMomentEmoji(this,'🎵')">🎵</span>
+    <span class="mc-emoji" onclick="selMomentEmoji(this,'🤝')">🤝</span>
+    <span class="mc-emoji" onclick="selMomentEmoji(this,'💼')">💼</span>
+    <span class="mc-emoji" onclick="selMomentEmoji(this,'🌍')">🌍</span>
+    <span class="mc-emoji" onclick="selMomentEmoji(this,'❤️')">❤️</span>
+    <span class="mc-emoji" onclick="selMomentEmoji(this,'🙏')">🙏</span>
+    <span class="mc-emoji" onclick="selMomentEmoji(this,'👔')">👔</span>
+    <span class="mc-emoji on" onclick="selMomentEmoji(this,'✨')">✨</span>
+    <span class="mc-emoji" onclick="selMomentEmoji(this,'🔥')">🔥</span>
+    <span class="mc-emoji" onclick="selMomentEmoji(this,'💪')">💪</span>
+    <span class="mc-emoji" onclick="selMomentEmoji(this,'🎉')">🎉</span>
+  </div>
+  <input class="mc-inp" id="mc-text" placeholder="Écris ton moment…" maxlength="120"/>
+  <div class="mc-colors">
+    <div class="mc-color sel" style="background:linear-gradient(135deg,#0A0C10,#1A1C22)" onclick="selMomentColor(this,'#0A0C10')"></div>
+    <div class="mc-color" style="background:linear-gradient(135deg,#0D1F35,#111A0E)" onclick="selMomentColor(this,'#0D1F35')"></div>
+    <div class="mc-color" style="background:linear-gradient(135deg,#2A1206,#14100A)" onclick="selMomentColor(this,'#2A1206')"></div>
+    <div class="mc-color" style="background:linear-gradient(135deg,#1C1006,#0E0808)" onclick="selMomentColor(this,'#1C1006')"></div>
+    <div class="mc-color" style="background:linear-gradient(135deg,#0A1A2E,#0A140A)" onclick="selMomentColor(this,'#0A1A2E')"></div>
+    <div class="mc-color" style="background:linear-gradient(135deg,#120A18,#0A160E)" onclick="selMomentColor(this,'#120A18')"></div>
+  </div>
+  <div class="mc-btns">
+    <button class="mc-btn mc-cancel" onclick="closeMomentCreator()">Annuler</button>
+    <button class="mc-btn mc-post" onclick="publishMoment()">Publier</button>
+  </div>
+</div>
+
+<!-- PROFILE MODAL -->
+<div id="profile-modal">
+  <div class="prof-box">
+    <button class="prof-close" onclick="hideProfile()">✕</button>
+    <div class="prof-banner" id="prof-banner"><div class="prof-banner-grd"></div><div class="prof-av-wrap"><div class="prof-av-lg av1" id="prof-av">?</div></div></div>
+    <div class="prof-body">
+      <div class="prof-name-row"><div class="prof-name" id="prof-name">Membre</div><span class="tier te" id="prof-tier">Libre</span></div>
+      <div class="prof-loc" id="prof-loc">KINOI.S</div>
+      <div class="prof-bio" id="prof-bio">"Biso na biso."</div>
+      <div class="prof-stats"><div class="pstat"><div class="pstat-n" id="prof-s1">0</div><div class="pstat-l">Connexions</div></div><div class="pstat"><div class="pstat-n" id="prof-s2">0</div><div class="pstat-l">Posts</div></div><div class="pstat"><div class="pstat-n" id="prof-s3">—</div><div class="pstat-l">Ville</div></div></div>
+      <div class="prof-actions">
+        <button class="prof-btn prof-btn-gold" onclick="toast('Demande envoyée ✓');hideProfile()">+ Connecter</button>
+        <button class="prof-btn prof-btn-out" onclick="go('messages');hideProfile()">Message</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MY PROFILE -->
+<div id="my-profile">
+  <div class="myp-box">
+    <button class="myp-close" onclick="hideMyProfile()">✕</button>
+    <div class="myp-title">Mon profil</div>
+    <div class="myp-av-section">
+      <div class="myp-av" id="myp-av" onclick="document.getElementById('avatar-input').click()">?</div>
+      <div class="myp-av-btn" onclick="document.getElementById('avatar-input').click()">Changer la photo</div>
+      <input type="file" id="avatar-input" accept="image/*" onchange="handleAvatar(event)"/>
+    </div>
+    <div class="myp-field"><label class="myp-lbl">Nom complet</label><input class="myp-inp" id="myp-username" type="text" placeholder="Ton nom"/></div>
+    <div class="myp-field"><label class="myp-lbl">Ville actuelle</label><input class="myp-inp" id="myp-city" type="text" placeholder="Bruxelles, Paris…"/></div>
+    <div class="myp-field"><label class="myp-lbl">Ville d'origine au Congo</label><input class="myp-inp" id="myp-origin" type="text" placeholder="Kinshasa, Lubumbashi…"/></div>
+    <div class="myp-field"><label class="myp-lbl">Secteur professionnel</label><input class="myp-inp" id="myp-sector" type="text" placeholder="Finance, Tech, Santé, Droit…"/></div>
+    <div class="myp-field"><label class="myp-lbl">Bio</label><input class="myp-inp" id="myp-bio" type="text" placeholder="Qui es-tu ?"/></div>
+    <button class="myp-save" onclick="saveProfile()">Sauvegarder</button>
+    <button class="myp-sub-btn" onclick="manageSub()">Gérer mon abonnement</button>
+    <button class="myp-logout" onclick="logout()">Se déconnecter</button>
+  </div>
+</div>
+
+<!-- ONBOARDING -->
+<div id="onboarding">
+  <div class="ob-box">
+    <div class="ob-prog"><div class="ob-dot on" id="obd1"></div><div class="ob-dot" id="obd2"></div><div class="ob-dot" id="obd3"></div><div class="ob-dot" id="obd4"></div><div class="ob-dot" id="obd5"></div></div>
+    <div id="ob1">
+      <div class="ob-ic">🌍</div><div class="ob-title">Tu viens d'où ?</div>
+      <div class="ob-sub">Connecte-toi avec ta communauté d'origine.</div>
+      <div class="ob-opts">
+        <div class="ob-opt" onclick="selOb(this,'origin')">Kinshasa</div><div class="ob-opt" onclick="selOb(this,'origin')">Lubumbashi</div>
+        <div class="ob-opt" onclick="selOb(this,'origin')">Goma</div><div class="ob-opt" onclick="selOb(this,'origin')">Bukavu</div>
+        <div class="ob-opt" onclick="selOb(this,'origin')">Kisangani</div><div class="ob-opt" onclick="selOb(this,'origin')">Matadi</div>
+        <div class="ob-opt" onclick="selOb(this,'origin')">Mbuji-Mayi</div><div class="ob-opt" onclick="selOb(this,'origin')">Autre</div>
+      </div>
+      <div class="ob-btns"><button class="ob-btn ob-skip" onclick="hideOnboarding()">Passer</button><button class="ob-btn ob-next" onclick="obStep(2)">Suivant</button></div>
+    </div>
+    <div id="ob2" style="display:none">
+      <div class="ob-ic">💼</div><div class="ob-title">Tes intérêts ?</div>
+      <div class="ob-sub">Choisis ce qui te parle le plus.</div>
+      <div class="ob-opts">
+        <div class="ob-opt" onclick="this.classList.toggle('on')">💼 Business</div><div class="ob-opt" onclick="this.classList.toggle('on')">🎵 Musique</div>
+        <div class="ob-opt" onclick="this.classList.toggle('on')">👔 SAPE</div><div class="ob-opt" onclick="this.classList.toggle('on')">🎟️ Events</div>
+        <div class="ob-opt" onclick="this.classList.toggle('on')">📡 Actualités</div><div class="ob-opt" onclick="this.classList.toggle('on')">🌍 Culture</div>
+        <div class="ob-opt" onclick="this.classList.toggle('on')">🍽️ Gastro</div><div class="ob-opt" onclick="this.classList.toggle('on')">⚽ Sport</div>
+      </div>
+      <div class="ob-btns"><button class="ob-btn ob-skip" onclick="hideOnboarding()">Passer</button><button class="ob-btn ob-next" onclick="obStep(3)">Suivant</button></div>
+    </div>
+    <div id="ob3" style="display:none">
+      <div class="ob-ic">🧭</div><div class="ob-title">Comment naviguer</div>
+      <div class="ob-sub">Les 5 sections de KINOI.S :</div>
+      <div style="width:100%;margin-bottom:1.2rem">
+        <div class="ob-tour-row"><span class="ob-tour-ic">🏠</span><div><div class="ob-tour-title">Feed</div><div class="ob-tour-desc">Actualités Congo, posts communauté, wisselkoers</div></div></div>
+        <div class="ob-tour-row"><span class="ob-tour-ic">🔍</span><div><div class="ob-tour-title">Explorer</div><div class="ob-tour-desc">Contenu par catégorie — musique, SAPE, business…</div></div></div>
+        <div class="ob-tour-row"><span class="ob-tour-ic">🤝</span><div><div class="ob-tour-title">Réseau</div><div class="ob-tour-desc">Professionnels congolais partout dans le monde</div></div></div>
+        <div class="ob-tour-row"><span class="ob-tour-ic">🎟️</span><div><div class="ob-tour-title">Events</div><div class="ob-tour-desc">25 events Congo — concerts, business, culture</div></div></div>
+        <div class="ob-tour-row"><span class="ob-tour-ic">💬</span><div><div class="ob-tour-title">Messages</div><div class="ob-tour-desc">Chat privé avec les membres (Élite)</div></div></div>
+      </div>
+      <div class="ob-btns"><button class="ob-btn ob-skip" onclick="hideOnboarding()">Passer</button><button class="ob-btn ob-next" onclick="obStep(4)">Suivant</button></div>
+    </div>
+    <div id="ob4" style="display:none">
+      <div class="ob-ic">✨</div><div class="ob-title">Les Moments Kinois</div>
+      <div class="ob-sub">Partage un Moment éphémère avec la communauté. Emoji + texte + couleur — simple, rapide, sincère.</div>
+      <div style="background:linear-gradient(135deg,#0D1F35,#111A0E);padding:1.5rem;text-align:center;margin-bottom:1.2rem;border:1px solid var(--gb)">
+        <div style="font-size:2.5rem;margin-bottom:0.5rem">🇨🇩</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:white">Biso na biso !</div>
+      </div>
+      <div class="ob-btns"><button class="ob-btn ob-skip" onclick="hideOnboarding()">Passer</button><button class="ob-btn ob-next" onclick="obStep(5)">Suivant</button></div>
+    </div>
+    <div id="ob5" style="display:none">
+      <div class="ob-ic">🇨🇩</div><div class="ob-title">Bienvenue sur KINOI.S</div>
+      <div class="ob-sub">Tu fais maintenant partie de la diaspora congolaise connectée.<br/><br/><em style="color:var(--gold)">Biso na biso — partout dans le monde.</em><br/><br/><span style="font-size:0.7rem;color:var(--w3)">Questions ? <strong style="color:var(--gold)">contact@kinoiss.com</strong></span></div>
+      <div class="ob-btns"><button class="ob-btn ob-next" onclick="hideOnboarding()">Commencer 🚀</button></div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"><div class="tdot"></div><span id="tmsg"></span></div>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  KINOI.S — Application JavaScript
+//  © 2026 KINOI.S — Tous droits réservés
+// ══════════════════════════════════════════════════════
+
+const SURL = 'https://agokbgqcjwovkrqzewou.supabase.co';
+const SKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnb2tiZ3FjandvdmtycXpld291Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MTA0NDEsImV4cCI6MjA5MzI4NjQ0MX0.4yPpSLnqFZZc67iScTsceUh8INZ-vM1qrM0Ev8h4mdg';
+const sb = supabase.createClient(SURL, SKEY);
+
+// ── PADDLE ──────────────────────────────────────────
+const P_ELITE   = 'pri_01kqmbk7394xvh731dbadfbkmp';
+const P_MAKAMBU = 'pri_01kqmbre6vjv1qvsaeq2ws9yje';
+
+// ── STATE ────────────────────────────────────────────
+let CU = null, CP = null, isReg = false;
+let mediaFile = null, mediaUrl = null;
+let momentEmoji = '✨', momentColor = '#0A0C10';
+let installPrompt = null;
+let moments = [];
+let currentMomentIdx = 0;
+let momentTimer = null;
+let obOrigin = '';
+
+// ── TIER SYSTEM ──────────────────────────────────────
+const TIERS = {free:0, elite:1, makambu:2};
+const PAGE_TIERS = {messages:'elite', network:'elite'};
+function tier(){ return CP?.tier || 'free'; }
+function hasAccess(t){ return TIERS[tier()] >= TIERS[t]; }
+function requireTier(t, msg){
+  if(hasAccess(t)) return true;
+  showUpgradeFor(t, msg);
+  return false;
+}
+function showUpgradeFor(t, msg){
+  toast(`Cette section est réservée aux membres ${t==='makambu'?'Makambu':'Élite'} 🔒`);
+}
+
+// ── LINGALA ──────────────────────────────────────────
+const LINGALA = [
+  {word:'Mbote na yo',trans:'"Bonjour à toi"',mean:'La première salutation que tout Congolais apprend partout dans le monde.'},
+  {word:'Biso na biso',trans:'"Nous entre nous"',mean:'L\'esprit de la communauté congolaise — ensemble, partout dans le monde.'},
+  {word:'Motema',trans:'"Le cœur"',mean:'Symbole de la chaleur humaine et de l\'amour qui caractérisent la culture congolaise.'},
+  {word:'Eloko malamu',trans:'"Quelque chose de bien"',mean:'Expression d\'appréciation — ce que KINOI.S apporte à la diaspora.'},
+  {word:'Bolingo',trans:'"L\'amour"',mean:'L\'amour familial et communautaire qui unit la diaspora congolaise.'},
+  {word:'Likambo nini?',trans:'"Qu\'est-ce qu\'il y a ?"',mean:'Question informelle qui marque l\'intérêt sincère pour l\'autre.'},
+  {word:'Ndeko',trans:'"Frère / Sœur"',mean:'Terme d\'affection pour désigner un compatriote congolais.'},
+];
+function setLingala(){
+  const l = LINGALA[new Date().getDate()%LINGALA.length];
+  ['ling-word','ling-word2'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=`<em>${l.word}</em>`;});
+  const t=document.getElementById('ling-trans'); if(t)t.textContent=l.trans;
+  const m=document.getElementById('ling-mean'); if(m)m.textContent=l.mean;
+}
+
+// ── EXCHANGE RATE ────────────────────────────────────
+async function loadExchangeRate(){
+  try {
+    const r = await fetch('https://open.er-api.com/v6/latest/EUR', {signal:AbortSignal.timeout(6000)});
+    const d = await r.json();
+    if(!d.rates) throw new Error('No rates');
+    const cdf = d.rates.CDF || 2850;
+    const usd = d.rates.USD || 1.08;
+    const gbp = d.rates.GBP || 0.85;
+    const cdfPerUsd = cdf/usd;
+    const cdfPerGbp = cdf/gbp;
+    const fmt = n => n >= 1000 ? (n/1000).toFixed(1)+'K' : Math.round(n).toLocaleString('fr');
+    const setEl = (id,v)=>{ const e=document.getElementById(id); if(e)e.textContent=v; };
+    setEl('ew-cdf', fmt(cdf));
+    setEl('ew-usd', fmt(cdfPerUsd));
+    setEl('ew-gbp', fmt(cdfPerGbp));
+    setEl('land-cdf', Math.round(cdf).toLocaleString('fr'));
+    setEl('land-rate', fmt(cdf));
+    setEl('rp-rate', fmt(cdf)+' CDF');
+    const now = new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    setEl('rp-updated', 'Mis à jour '+now);
+    ['ew-cdf-trend','ew-usd-trend','ew-gbp-trend'].forEach(id=>{ const e=document.getElementById(id); if(e){ e.className='ew-trend ew-up'; e.textContent='↑ Live'; }});
+  } catch(e){
+    ['ew-cdf','ew-usd','ew-gbp'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='2.8K';});
+    const el=document.getElementById('land-cdf');if(el)el.textContent='2.800';
+  }
+}
+
+// ── RSS NEWS ─────────────────────────────────────────
+const FEEDS = [
+  {name:'Radio Okapi',url:'https://radiookapi.net/feed',emoji:'📻'},
+  {name:'Actualité.cd',url:'https://actualite.cd/feed',emoji:'📰'},
+  {name:'7sur7.cd',url:'https://7sur7.cd/feed',emoji:'🗞️'},
+  {name:'Congo Indépendant',url:'https://www.congoindependant.com/feed',emoji:'📡'},
+];
+const FALLBACK_NEWS = [
+  {title:'Radio Okapi — Toute l\'actualité de la RDC',link:'https://radiookapi.net',source:'Radio Okapi',emoji:'📻'},
+  {title:'Actualité.cd — Infos Congo en direct',link:'https://actualite.cd',source:'Actualité.cd',emoji:'📰'},
+  {title:'7sur7.cd — Dernières nouvelles',link:'https://7sur7.cd',source:'7sur7.cd',emoji:'🗞️'},
+  {title:'Congo Indépendant — Analyse et opinion',link:'https://congoindependant.com',source:'Congo Ind.',emoji:'📡'},
+];
+async function loadNews(){
+  const el = document.getElementById('news-feed');
+  const items = [];
+  for(const f of FEEDS){
+    try {
+      const r = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(f.url)}&count=3`, {signal:AbortSignal.timeout(5000)});
+      const d = await r.json();
+      if(d.status==='ok' && d.items?.length) d.items.forEach(i=>items.push({...i,source:f.name,emoji:f.emoji}));
+    } catch(_){
+      try {
+        const r2 = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(f.url)}`, {signal:AbortSignal.timeout(5000)});
+        const d2 = await r2.json();
+        if(d2.contents){
+          const xml = new DOMParser().parseFromString(d2.contents,'text/xml');
+          [...xml.querySelectorAll('item')].slice(0,3).forEach(it=>{
+            items.push({title:it.querySelector('title')?.textContent||'',link:it.querySelector('link')?.textContent||f.url,pubDate:it.querySelector('pubDate')?.textContent||'',source:f.name,emoji:f.emoji});
+          });
+        }
+      } catch(_2){}
+    }
+  }
+  if(!items.length){
+    el.innerHTML = FALLBACK_NEWS.map(i=>`<div class="news-item" onclick="window.open('${i.link}','_blank')"><div class="news-badge">${i.emoji} ${i.source}</div><div><div class="news-title">${i.title}</div><div class="news-date">Cliquer pour lire →</div></div></div>`).join('');
+    return;
+  }
+  items.sort((a,b)=>new Date(b.pubDate)-new Date(a.pubDate));
+  el.innerHTML = items.slice(0,8).map(i=>`<div class="news-item" onclick="window.open('${i.link.trim()}','_blank')"><div class="news-badge">${i.emoji} ${i.source}</div><div><div class="news-title">${i.title.trim()}</div><div class="news-date">${i.pubDate?new Date(i.pubDate).toLocaleDateString('fr-FR',{day:'numeric',month:'short'}):''}</div></div></div>`).join('');
+}
+
+// ── EVENTS DATA (25 events) ───────────────────────────
+const EVENTS = [
+  {id:'e1',city:'par',date:'2 Mai 2026',title:'Fally Ipupa — 20 Ans de Musique',type:'Concert',loc:'🇫🇷 Paris · Stade de France',meta:'📅 2 mai 2026 · 📍 Stade de France · 🎵 20 ans de carrière',bg:'bg-concert',desc:'Un moment historique. Fally célèbre 20 ans de musique sur la scène mondiale la plus emblématique.'},
+  {id:'e2',city:'bxl',date:'Juin 2026',title:'Solidarité Congo — Bruxelles',type:'Concert Caritatif',loc:'🇧🇪 Bruxelles · En préparation',meta:'📅 Juin 2026 · 📍 Bruxelles · ❤️ Soutien humanitaire',bg:'bg-kinshasa',desc:'Après le succès de Paris, le concert Solidarité Congo arrive à Bruxelles.'},
+  {id:'e3',city:'par',date:'28-30 Avr 2026',title:'Congo Week Paris 2026',type:'Culture',loc:'🇫🇷 Paris · Cœur de Paris',meta:'📅 28-30 avril 2026 · 🌍 Art, musique, gastronomie · 🤝 Networking',bg:'bg-culture',desc:'3 jours de célébration de la culture congolaise — art, musique, gastronomie, networking.'},
+  {id:'e4',city:'bxl',date:'30 Juin 2026',title:'Gala Indépendance RDC',type:'Gala',loc:'🇧🇪 Bruxelles',meta:'📅 30 juin 2026 · 🇨🇩 66e anniversaire · 👗 Tenue de soirée',bg:'bg-goma',desc:'Célébration du 66e anniversaire de l\'indépendance de la République Démocratique du Congo.'},
+  {id:'e5',city:'int',date:'2026',title:'Forum Économique Europe-Congo 2026',type:'Business',loc:'🌍 Europe',meta:'📅 2026 · 💼 Investissement · 🤝 Partenariats stratégiques',bg:'bg-biz',desc:'Forum de coopération entre l\'Europe, l\'Afrique et la diaspora congolaise. 14 thématiques prioritaires.'},
+  {id:'e6',city:'par',date:'Juil 2026',title:'Koffi Olomidé — Paris',type:'Concert',loc:'🇫🇷 Paris · Île-de-France',meta:'📅 Juillet 2026 · 🎵 Rumba · 👑 Légende vivante',bg:'bg-concert',desc:'Koffi Olomidé et son Quartier Latin International — 40 ans de soukous/rumba.'},
+  {id:'e7',city:'lon',date:'Juil 2026',title:'Sapeur Fashion Week — London',type:'Mode',loc:'🇬🇧 Londres · Brixton',meta:'📅 Juillet 2026 · 👔 SAPE · 🎨 Identité congolaise',bg:'bg-sape',desc:'L\'élégance congolaise s\'impose à Londres. Défilé, expo photo et rencontres de Sapeurs.'},
+  {id:'e8',city:'ams',date:'Août 2026',title:'Congo Film Festival — Amsterdam',type:'Culture',loc:'🇳🇱 Amsterdam · Eye Filmmuseum',meta:'📅 Août 2026 · 🎬 Cinéma congolais · 🌍 Diaspora',bg:'bg-culture',desc:'Premier festival du film congolais en Europe du Nord. Courts et longs métrages de la diaspora.'},
+  {id:'e9',city:'int',date:'Sept 2026',title:'Africa Tech Summit — Kinshasa',type:'Tech',loc:'🇨🇩 Kinshasa · Palais du Peuple',meta:'📅 Septembre 2026 · 💻 Innovation · 🚀 Startups DRC',bg:'bg-biz',desc:'Le plus grand summit tech d\'Afrique centrale. Startups, investisseurs, innovation.'},
+  {id:'e10',city:'bxl',date:'Sept 2026',title:'Congo Business Night — Bruxelles',type:'Networking',loc:'🇧🇪 Bruxelles · EU Quarter',meta:'📅 Septembre 2026 · 💼 B2B · 🌍 Diaspora pro',bg:'bg-biz',desc:'Soirée de networking business de la diaspora congolaise à Bruxelles.'},
+  {id:'e11',city:'par',date:'Sept 2026',title:'Festival Rumba UNESCO — Paris',type:'Concert',loc:'🇫🇷 Paris · Institut du Monde Arabe',meta:'📅 Septembre 2026 · 🎵 Rumba Congolaise UNESCO · 🌍 Patrimoine',bg:'bg-jazz',desc:'Célébration de la Rumba Congolaise, patrimoine immatériel de l\'UNESCO.'},
+  {id:'e12',city:'ams',date:'Sept 2026',title:'Congolese Food Festival — Amsterdam',type:'Gastronomie',loc:'🇳🇱 Amsterdam · Westergasfabriek',meta:'📅 Septembre 2026 · 🍽️ Pondu, moambe, liboke · 🎵 Musique live',bg:'bg-food',desc:'Les saveurs du Congo à Amsterdam. Cuisine authentique, marché artisanal, musique live.'},
+  {id:'e13',city:'lon',date:'Oct 2026',title:'Congolese Diaspora Conference — London',type:'Conférence',loc:'🇬🇧 Londres · QEII Centre',meta:'📅 Octobre 2026 · 🌍 Diaspora · 💼 Économie & Culture',bg:'bg-biz',desc:'Conférence internationale de la diaspora congolaise. Politique, économie, culture.'},
+  {id:'e14',city:'bxl',date:'Oct 2026',title:'Women Leaders Forum — Bruxelles',type:'Forum',loc:'🇧🇪 Bruxelles · Parlement Européen',meta:'📅 Octobre 2026 · 👩 Femmes leaders · 🌍 Diaspora',bg:'bg-kinshasa',desc:'Forum des femmes leaders de la diaspora congolaise. Entrepreneuriat, politique, impact.'},
+  {id:'e15',city:'int',date:'Oct 2026',title:'DRC Investment Forum — Genève',type:'Business',loc:'🇨🇭 Genève · Palais des Nations',meta:'📅 Octobre 2026 · 💰 Investissement · 🌍 RDC',bg:'bg-biz',desc:'Forum d\'investissement dédié à la République Démocratique du Congo. Secteurs minier, agricole, tech.'},
+  {id:'e16',city:'par',date:'Oct 2026',title:'Wenge Musica — Paris',type:'Concert',loc:'🇫🇷 Paris · L\'Olympia',meta:'📅 Octobre 2026 · 🎵 N\'dombolo · 🔥 Retour légendaire',bg:'bg-concert',desc:'Le retour tant attendu de Wenge Musica sur la scène parisienne. N\'dombolo et rumba.'},
+  {id:'e17',city:'ams',date:'Nov 2026',title:'Nuit Congolaise — Amsterdam',type:'Soirée',loc:'🇳🇱 Amsterdam · Melkweg',meta:'📅 Novembre 2026 · 🎵 Rumba & N\'dombolo · 🎉 Community',bg:'bg-concert',desc:'La grande soirée de la communauté congolaise d\'Amsterdam. Musique, danse, communauté.'},
+  {id:'e18',city:'int',date:'Nov 2026',title:'DRC Investment Conference — Dubai',type:'Business',loc:'🇦🇪 Dubaï · DIFC',meta:'📅 Novembre 2026 · 💼 Investissement · 🌍 Afrique-Golfe',bg:'bg-biz',desc:'Conférence sur l\'investissement en RDC pour les acteurs du Moyen-Orient et d\'Afrique.'},
+  {id:'e19',city:'par',date:'Nov 2026',title:'Santé Diaspora Forum — Paris',type:'Forum',loc:'🇫🇷 Paris · Maison de la Chimie',meta:'📅 Novembre 2026 · ⚕️ Santé · 🌍 Diaspora congolaise',bg:'bg-kinshasa',desc:'Forum sur la santé de la diaspora congolaise. Accès aux soins, santé mentale, médecines.'},
+  {id:'e20',city:'lon',date:'Nov 2026',title:'Congo Photography Exhibition',type:'Expo',loc:'🇬🇧 Londres · Victoria & Albert Museum',meta:'📅 Novembre 2026 · 📸 Photo · 🌍 Congo à travers les âges',bg:'bg-culture',desc:'Exposition photographique retraçant l\'histoire et la vie du Congo à travers les décennies.'},
+  {id:'e21',city:'bxl',date:'Nov 2026',title:'Gala Matonge — Bruxelles',type:'Gala',loc:'🇧🇪 Bruxelles · Ixelles',meta:'📅 Novembre 2026 · 🌆 Matonge · 🎵 Culture',bg:'bg-kinshasa',desc:'Le grand gala annuel du quartier Matonge. Musique, cuisine, mode et communauté.'},
+  {id:'e22',city:'int',date:'Déc 2026',title:'Kinshasa Marathon 2026',type:'Sport',loc:'🇨🇩 Kinshasa',meta:'📅 Décembre 2026 · 🏃 Marathon · 🇨🇩 42km dans Kinshasa',bg:'bg-concert',desc:'Le marathon international de Kinshasa. Des milliers de coureurs dans les rues de la capitale.'},
+  {id:'e23',city:'par',date:'Déc 2026',title:'Festival Lingala — Paris',type:'Culture',loc:'🇫🇷 Paris · Cabaret Sauvage',meta:'📅 Décembre 2026 · 🎵 Lingala · 🌍 Langue & culture',bg:'bg-jazz',desc:'Célébration de la langue Lingala à travers la musique, la poésie et les arts.'},
+  {id:'e24',city:'bxl',date:'Déc 2026',title:'Congo Diaspora Awards 2026',type:'Gala',loc:'🇧🇪 Bruxelles · Palais des Beaux-Arts',meta:'📅 Décembre 2026 · 🏆 Awards · 👑 Reconnaissance',bg:'bg-biz',desc:'Cérémonie de remise des prix récompensant les membres les plus influents de la diaspora congolaise.'},
+  {id:'e25',city:'bxl',date:'31 Déc 2026',title:'Réveillon Kinois 2027 — Bruxelles',type:'Gala',loc:'🇧🇪 Bruxelles · Centre-ville',meta:'📅 31 décembre 2026 · 🎉 Réveillon · 🇨🇩 Biso na biso',bg:'bg-goma',desc:'Le plus grand réveillon de la diaspora congolaise de Bruxelles. Musique, danse, fête.'},
+];
+function renderEvents(cityFilter){
+  const filtered = cityFilter==='all' ? EVENTS : EVENTS.filter(e=>e.city===cityFilter||e.city==='int'&&cityFilter==='int');
+  const container = document.getElementById('events-list');
+  container.innerHTML = filtered.map(ev=>`
+    <div class="ecard" data-city="${ev.city}">
+      <div class="e-banner">
+        <div class="e-banner-bg ${ev.bg}"></div>
+        <div class="e-grd"></div>
+        <div class="e-loc">${ev.loc}</div>
+        <div class="e-type">${ev.type}</div>
+      </div>
+      <div class="e-body">
+        <div class="e-lbl">${ev.type} · ${ev.date}</div>
+        <div class="e-title">${ev.title}</div>
+        <div class="e-meta">${ev.meta}</div>
+        <div class="e-btns">
+          <button class="ebtn ebtn-out" onclick="toast('Ajouté à tes events ✓')">+ Intéressé</button>
+          <button class="ebtn ebtn-out" onclick="toast('Lien copié 📋')">↗ Partager</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+function filterEvents(el, city){
+  el.closest('.cpills').querySelectorAll('.cpill').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  renderEvents(city);
+}
+
+// ── AUTH ─────────────────────────────────────────────
+function showLogin(){ document.getElementById('landing').classList.remove('show'); document.getElementById('login-screen').classList.add('show'); }
+function switchTab(el, mode){
+  document.querySelectorAll('.ltab').forEach(t=>t.classList.remove('on')); el.classList.add('on');
+  isReg = mode==='register';
+  document.getElementById('lf-name').style.display = isReg?'flex':'none';
+  document.getElementById('lf-city').style.display = isReg?'flex':'none';
+  document.getElementById('l-btn').textContent = isReg?'Créer mon compte gratuit':'Se connecter';
+  document.getElementById('l-note').innerHTML = isReg?'Déjà un compte ? <span onclick="switchTabByName(\'login\')">Se connecter</span>':'Pas encore ? <span onclick="switchTabByName(\'register\')">Créer un compte gratuit</span>';
+  document.getElementById('l-err').classList.remove('on');
+}
+function switchTabByName(m){ switchTab(document.querySelectorAll('.ltab')[m==='login'?0:1], m); }
+
+async function doAuth(){
+  const email=document.getElementById('l-email').value.trim();
+  const pass=document.getElementById('l-pass').value;
+  const errEl=document.getElementById('l-err');
+  const btn=document.getElementById('l-btn');
+  if(!email||!pass){ showErr('Remplis tous les champs.'); return; }
+  btn.textContent='…'; btn.disabled=true;
+  try {
+    let res;
+    if(isReg){
+      res = await sb.auth.signUp({email,password:pass,options:{data:{username:document.getElementById('l-name').value||email.split('@')[0],city:document.getElementById('l-city').value||''}}});
+      if(res.error) throw res.error;
+      if(res.data.user && !res.data.session){ showErr('Vérifie ton email pour confirmer.'); btn.textContent='Créer mon compte gratuit'; btn.disabled=false; return; }
+    } else {
+      res = await sb.auth.signInWithPassword({email,password:pass});
+      if(res.error) throw res.error;
+    }
+    CU = res.data.user;
+    await onLogin(isReg);
+  } catch(e){
+    showErr(e.message==='Invalid login credentials'?'Email ou mot de passe incorrect.':e.message);
+    btn.textContent=isReg?'Créer mon compte gratuit':'Se connecter';
+    btn.disabled=false;
+  }
+}
+function showErr(msg){ const e=document.getElementById('l-err'); e.textContent=msg; e.classList.add('on'); }
+
+async function onLogin(isNew){
+  document.getElementById('login-screen').classList.remove('show');
+  document.getElementById('app').classList.add('on');
+  await loadProfile();
+  updateUI();
+  loadFeedPosts();
+  loadNews();
+  loadNetworkMembers();
+  loadExplore('all');
+  loadOnlineMembers();
+  loadMemberCount();
+  loadMoments();
+  renderEvents('all');
+  if(isNew) setTimeout(()=>document.getElementById('onboarding').classList.add('show'),800);
+  else toast('Bon retour sur KINOI.S 🇨🇩');
+  if(!localStorage.getItem('kinois-cookies')) document.getElementById('cookie-bar').classList.add('show');
+}
+
+async function loadProfile(){
+  if(!CU) return;
+  const {data} = await sb.from('profiles').select('*').eq('id',CU.id).single();
+  if(data){ CP=data; return; }
+  const meta = CU.user_metadata||{};
+  const {data:np} = await sb.from('profiles').insert({id:CU.id,username:meta.username||CU.email.split('@')[0],city:meta.city||'',origin:'',bio:'',tier:'free'}).select().single();
+  CP=np;
+}
+function updateUI(){
+  if(!CP) return;
+  const init=(CP.username||'K').substring(0,2).toUpperCase();
+  const els=['tb-av','lnav-av','create-av'];
+  els.forEach(id=>{const el=document.getElementById(id);if(!el)return;if(CP.avatar_url){el.innerHTML=`<img src="${CP.avatar_url}"/>`;el.style.padding='0';}else el.textContent=init;});
+  // Progress bar
+  const fields=['username','city','origin','bio','avatar_url','sector'];
+  const filled=fields.filter(f=>CP[f]&&CP[f].trim&&CP[f].trim()).length;
+  const pct=Math.round((filled/fields.length)*100);
+  const pbw=document.getElementById('progress-bar-widget');
+  if(pbw&&pct<100){
+    pbw.style.display='block';
+    pbw.innerHTML=`<div class="profile-progress" onclick="showMyProfile()"><div class="pp-top"><div class="pp-title">Complète ton profil</div><div class="pp-pct">${pct}%</div></div><div class="pp-bar"><div class="pp-fill" style="width:${pct}%"></div></div><div class="pp-hint">Clique pour compléter ton profil et augmenter ta visibilité dans le réseau.</div></div>`;
+  }
+  // Lock icons
+  if(!hasAccess('elite')){
+    document.querySelectorAll('.nb,.bn').forEach(nb=>{
+      const lbl=nb.querySelector('.nb-lbl,.bn-lbl');
+      if(lbl&&(lbl.textContent==='Réseau'||lbl.textContent==='Messages')&&!nb.querySelector('.lock-ic')){
+        const l=document.createElement('span');l.className='lock-ic';l.textContent='🔒';l.style.cssText='position:absolute;top:2px;right:2px;font-size:0.45rem;';nb.appendChild(l);
+      }
+    });
+  }
+}
+async function logout(){
+  await sb.auth.signOut(); CU=null; CP=null;
+  document.getElementById('app').classList.remove('on');
+  document.getElementById('my-profile').classList.remove('show');
+  document.getElementById('landing').classList.add('show');
+}
+
+// ── POSTS ────────────────────────────────────────────
+async function loadFeedPosts(){
+  const el=document.getElementById('feed-posts');
+  const {data} = await sb.from('posts').select('*,profiles(username,avatar_url,city,origin,tier)').order('created_at',{ascending:false}).limit(10);
+  if(!data||!data.length){
+    el.innerHTML=`<div class="empty"><div class="empty-ic">📝</div><div class="empty-t">Sois le premier à poster</div><div class="empty-s">La communauté t'attend. Partage quelque chose avec les Kinois du monde entier.</div></div>`;
+    return;
+  }
+  el.innerHTML=data.map(p=>renderPost(p)).join('');
+}
+function renderPost(p){
+  const pr=p.profiles||{};
+  const name=pr.username||'Membre';
+  const init=name.substring(0,2).toUpperCase();
+  const avColors=['av1','av2','av3','av4','av5'];
+  const avc=avColors[name.charCodeAt(0)%avColors.length];
+  const date=new Date(p.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+  const bgMap={musique:'bg-jazz',sape:'bg-sape',business:'bg-biz',culture:'bg-culture',gastronomie:'bg-food',events:'bg-concert',default:'bg-kinshasa'};
+  const media=p.media_url?`<div class="post-media"><img class="post-media-img" src="${p.media_url}" loading="lazy"/><div class="post-media-grd"></div>${p.category?`<div class="media-cat-tag">${p.category}</div>`:''}</div>`:p.category?`<div class="post-media" style="aspect-ratio:16/9"><div class="post-media-bg ${bgMap[p.category]||bgMap.default}"></div><div class="post-media-grd"></div><div class="media-cat-tag">${p.category}</div></div>`:'';
+  const tierBadge=pr.tier==='makambu'?'<span class="tier tm">Makambu</span>':pr.tier==='elite'?'<span class="tier te">Élite</span>':'';
+  return `<div class="post-card"><div class="post-head"><div class="av ${avc}">${pr.avatar_url?`<img src="${pr.avatar_url}" loading="lazy"/>`:init}</div><div class="pm"><div class="pname">${name} ${tierBadge}</div><div class="ptime">${date}${pr.city?' · '+pr.city:''}${pr.origin?' · Originaire de '+pr.origin:''}</div></div><div class="pmore">···</div></div>${media}<div class="post-body">${p.content}</div><div class="post-tags">${p.category?`<span class="ptag">#${p.category}</span>`:''}</div><div class="post-acts"><div class="pact" onclick="likePost(this,'${p.id}',${p.likes||0})">❤️ ${p.likes||0}</div><div class="pact">💬 Commenter</div><div class="pact">↗ Partager</div></div></div>`;
+}
+async function likePost(el,id,cur){
+  el.classList.toggle('liked');
+  const nl=el.classList.contains('liked')?cur+1:Math.max(0,cur-1);
+  await sb.from('posts').update({likes:nl}).eq('id',id);
+  el.textContent=`❤️ ${nl}`;
+}
+function handleMedia(e){
+  const f=e.target.files[0]; if(!f)return; mediaFile=f;
+  const r=new FileReader(); r.onload=ev=>{mediaUrl=ev.target.result;document.getElementById('media-preview').src=mediaUrl;document.getElementById('media-preview-wrap').classList.add('on');};
+  r.readAsDataURL(f);
+}
+function removeMedia(){mediaFile=null;mediaUrl=null;document.getElementById('media-preview-wrap').classList.remove('on');document.getElementById('media-input').value='';}
+async function createPost(){
+  if(!CU){toast('Connecte-toi pour poster.');return;}
+  const content=document.getElementById('post-inp').value.trim();
+  if(!content){toast('Écris quelque chose d\'abord.');return;}
+  const cat=document.getElementById('post-cat').value;
+  toast('Publication en cours…');
+  let media_url=null;
+  if(mediaFile){
+    const path=`${CU.id}/${Date.now()}_${mediaFile.name}`;
+    const {data,error}=await sb.storage.from('post-media').upload(path,mediaFile);
+    if(!error){const {data:u}=sb.storage.from('post-media').getPublicUrl(path);media_url=u.publicUrl;}
+  }
+  const {error}=await sb.from('posts').insert({user_id:CU.id,content,media_url,category:cat,likes:0});
+  if(error){toast('Erreur lors de la publication.');return;}
+  document.getElementById('post-inp').value='';
+  document.getElementById('post-cat').value='';
+  removeMedia();
+  toast('Post publié ! 🎉');
+  loadFeedPosts();
+}
+
+// ── EXPLORE ──────────────────────────────────────────
+async function loadExplore(cat){
+  const grid=document.getElementById('xgrid');
+  const empty=document.getElementById('xempty');
+  let q=sb.from('posts').select('*,profiles(username)').order('likes',{ascending:false}).limit(6);
+  if(cat!=='all') q=q.eq('category',cat);
+  const {data}=await q;
+  const bgMap={musique:'bg-jazz',sape:'bg-sape',business:'bg-biz',culture:'bg-culture',gastronomie:'bg-food',events:'bg-concert',sport:'bg-kinshasa',actualites:'bg-goma'};
+  if(!data||!data.length){grid.style.display='none';empty.style.display='flex';return;}
+  grid.style.display='grid';empty.style.display='none';
+  grid.innerHTML=data.map(p=>`<div class="xcard" onclick="toast('${(p.content||'').substring(0,50).replace(/'/g,'').replace(/"/g,'')}…')"><div class="xcard-bg ${p.media_url?'':''+bgMap[p.category]||'bg-kinshasa'}" ${p.media_url?`style="background-image:url('${p.media_url}');background-size:cover"`:''}>` +
+    `</div><div class="xcard-grd"></div><div class="xcard-body"><div class="xcard-cat">${p.category||'Général'}</div><div class="xcard-title">${(p.content||'').substring(0,60)}</div><div class="xcard-meta"><span>❤️ ${p.likes||0}</span></div></div></div>`).join('');
+}
+function xcFilter(el,cat){
+  el.closest('.xcat').querySelectorAll('.xcpill').forEach(p=>p.classList.remove('on'));el.classList.add('on');
+  loadExplore(cat);
+}
+
+// ── NETWORK ──────────────────────────────────────────
+async function loadNetworkMembers(){
+  const grid=document.getElementById('net-grid');
+  const empty=document.getElementById('net-empty');
+  const {data}=await sb.from('profiles').select('*').neq('id',CU?.id||'null').limit(8);
+  if(!data||!data.length){grid.innerHTML='';empty.style.display='flex';return;}
+  empty.style.display='none';
+  const avC=['av1','av2','av3','av4','av5'];
+  grid.innerHTML=data.map(m=>{
+    const init=(m.username||'K').substring(0,2).toUpperCase();
+    const av=avC[(m.username||'K').charCodeAt(0)%avC.length];
+    const tb=m.tier==='makambu'?'<span class="tier tm">Makambu</span>':m.tier==='elite'?'<span class="tier te">Élite</span>':'';
+    return `<div class="nc" onclick="showUserProfile('${m.id}','${(m.username||'Membre').replace(/'/g,'')}','${m.city||''}','${m.origin||''}','${(m.bio||'').replace(/'/g,'')}','${m.tier||'free'}')">
+      <div class="nc-top"><div class="nc-av ${av}">${m.avatar_url?`<img src="${m.avatar_url}" loading="lazy"/>`:init}</div>${tb}</div>
+      <div class="nc-name">${m.username||'Membre'}</div>
+      <div class="nc-role">${m.sector||m.bio||''}</div>
+      <div class="nc-city">${m.city||''}${m.origin?' · '+m.origin:''}</div>
+      <button class="nc-btn" onclick="event.stopPropagation();this.classList.toggle('on');this.textContent=this.classList.contains('on')?'Connecté ✓':'+ Connecter'">+ Connecter</button>
+    </div>`;
+  }).join('');
+}
+async function filterNet(el, city){
+  el.closest('.cpills').querySelectorAll('.cpill').forEach(c=>c.classList.remove('on'));el.classList.add('on');
+  const grid=document.getElementById('net-grid');
+  const empty=document.getElementById('net-empty');
+  let q=sb.from('profiles').select('*').neq('id',CU?.id||'null').limit(8);
+  if(city!=='all') q=q.ilike('city',`%${city}%`);
+  const {data}=await q;
+  if(!data||!data.length){grid.innerHTML='';empty.style.display='flex';return;}
+  empty.style.display='none';
+  const avC=['av1','av2','av3','av4','av5'];
+  grid.innerHTML=data.map(m=>{
+    const init=(m.username||'K').substring(0,2).toUpperCase();
+    const av=avC[(m.username||'K').charCodeAt(0)%avC.length];
+    return `<div class="nc"><div class="nc-top"><div class="nc-av ${av}">${m.avatar_url?`<img src="${m.avatar_url}" loading="lazy"/>`:init}</div></div><div class="nc-name">${m.username||'Membre'}</div><div class="nc-role">${m.sector||m.bio||''}</div><div class="nc-city">${m.city||''}</div><button class="nc-btn" onclick="this.classList.toggle('on');this.textContent=this.classList.contains('on')?'Connecté ✓':'+ Connecter'">+ Connecter</button></div>`;
+  }).join('');
+}
+async function loadOnlineMembers(){
+  const el=document.getElementById('online-members');
+  const {data}=await sb.from('profiles').select('username,city,avatar_url,tier').limit(5);
+  if(!data||!data.length){el.innerHTML='<div style="font-size:0.68rem;color:var(--w3);padding:0.3rem 0">Aucun membre en ligne</div>';return;}
+  const avC=['av1','av2','av3','av4','av5'];
+  el.innerHTML=data.map(m=>{
+    const init=(m.username||'K').substring(0,2).toUpperCase();
+    const av=avC[(m.username||'K').charCodeAt(0)%avC.length];
+    return `<div class="rm"><div class="rm-av ${av}"><div class="rm-on"></div>${m.avatar_url?`<img src="${m.avatar_url}" loading="lazy"/>`:init}</div><div class="rm-name">${m.username||'Membre'}</div><button class="rc-btn" onclick="this.classList.toggle('on');this.textContent=this.classList.contains('on')?'Connecté':'Connecter'">Connecter</button></div>`;
+  }).join('');
+}
+async function loadMemberCount(){
+  const {count}=await sb.from('profiles').select('*',{count:'exact',head:true});
+  const el=document.getElementById('member-count');if(el)el.textContent=count||0;
+}
+
+// ── PROFILE ──────────────────────────────────────────
+function showMyProfile(){
+  if(!CP)return;
+  document.getElementById('myp-username').value=CP.username||'';
+  document.getElementById('myp-city').value=CP.city||'';
+  document.getElementById('myp-origin').value=CP.origin||'';
+  document.getElementById('myp-bio').value=CP.bio||'';
+  document.getElementById('myp-sector').value=CP.sector||'';
+  if(CP.avatar_url){document.getElementById('myp-av').innerHTML=`<img src="${CP.avatar_url}"/>`;document.getElementById('myp-av').style.padding='0';}
+  else document.getElementById('myp-av').textContent=(CP.username||'K').substring(0,2).toUpperCase();
+  document.getElementById('my-profile').classList.add('show');
+}
+function hideMyProfile(){document.getElementById('my-profile').classList.remove('show');}
+async function handleAvatar(e){
+  const f=e.target.files[0];if(!f||!CU)return;toast('Upload en cours…');
+  const path=`${CU.id}/avatar_${Date.now()}`;
+  const {error}=await sb.storage.from('avatars').upload(path,f,{upsert:true});
+  if(error){toast('Erreur upload.');return;}
+  const {data:u}=sb.storage.from('avatars').getPublicUrl(path);
+  await sb.from('profiles').update({avatar_url:u.publicUrl}).eq('id',CU.id);
+  CP.avatar_url=u.publicUrl;
+  document.getElementById('myp-av').innerHTML=`<img src="${u.publicUrl}"/>`;
+  updateUI();toast('Photo mise à jour ✓');
+}
+async function saveProfile(){
+  if(!CU)return;
+  const updates={username:document.getElementById('myp-username').value,city:document.getElementById('myp-city').value,origin:document.getElementById('myp-origin').value,bio:document.getElementById('myp-bio').value,sector:document.getElementById('myp-sector').value};
+  const {error}=await sb.from('profiles').update(updates).eq('id',CU.id);
+  if(error){toast('Erreur sauvegarde.');return;}
+  Object.assign(CP,updates);updateUI();hideMyProfile();toast('Profil mis à jour ✓');
+}
+function showUserProfile(id,name,city,origin,bio,tier){
+  const init=name.substring(0,2).toUpperCase();
+  const avC=['av1','av2','av3','av4','av5'];
+  const av=avC[name.charCodeAt(0)%avC.length];
+  document.getElementById('prof-name').textContent=name;
+  document.getElementById('prof-av').textContent=init;
+  document.getElementById('prof-av').className=`prof-av-lg ${av}`;
+  document.getElementById('prof-loc').textContent=`${city}${origin?' · '+origin:''}`;
+  document.getElementById('prof-bio').textContent=bio||'"Biso na biso."';
+  document.getElementById('prof-tier').textContent=tier==='makambu'?'Makambu':tier==='elite'?'Élite':'Libre';
+  document.getElementById('profile-modal').classList.add('show');
+}
+function hideProfile(){document.getElementById('profile-modal').classList.remove('show');}
+function manageSub(){hideMyProfile();toast('Redirection vers la gestion…');setTimeout(()=>window.open('https://www.paddle.com/account','_blank'),600);}
+
+// ── MOMENTS (original concept — not Instagram/TikTok) ─
+async function loadMoments(){
+  const bar=document.getElementById('moments-bar');
+  const {data}=await sb.from('moments').select('*,profiles(username,avatar_url)').order('created_at',{ascending:false}).limit(10);
+  moments=data||[];
+  let html=`<div class="moment-item" onclick="openMomentCreator()"><div class="moment-ring add-new"><div class="moment-av" style="font-size:1.4rem;color:var(--w3)">＋</div></div><div class="moment-name">Moment</div></div>`;
+  moments.forEach((m,i)=>{
+    const p=m.profiles||{};
+    const name=(p.username||'K').substring(0,2).toUpperCase();
+    html+=`<div class="moment-item" onclick="viewMoment(${i})">
+      <div class="moment-ring"><div class="moment-av" style="background:${m.bg_color||'#0A0C10'}"><span style="font-size:1.3rem">${m.emoji||'✨'}</span></div></div>
+      <div class="moment-name">${p.username||'Membre'}</div>
+    </div>`;
+  });
+  bar.innerHTML=html;
+}
+function viewMoment(idx){
+  if(!moments.length)return;
+  currentMomentIdx=idx;
+  const m=moments[idx];
+  const mv=document.getElementById('moment-viewer');
+  const bg=document.getElementById('mv-bg');
+  bg.style.background=m.bg_color||'#0A0C10';
+  document.getElementById('mv-emoji').textContent=m.emoji||'✨';
+  document.getElementById('mv-text').textContent=m.text||'';
+  document.getElementById('mv-author').textContent=m.profiles?.username||'Membre';
+  const prog=document.getElementById('mv-progress');
+  prog.innerHTML=moments.map((_,i)=>`<div class="mv-prog-bar"><div class="mv-prog-fill" id="mpf${i}" style="width:${i<idx?'100%':'0%'}"></div></div>`).join('');
+  mv.classList.add('show');
+  if(momentTimer)clearInterval(momentTimer);
+  let pct=0;
+  const fill=document.getElementById(`mpf${idx}`);
+  momentTimer=setInterval(()=>{
+    pct+=2;if(fill)fill.style.width=pct+'%';
+    if(pct>=100){clearInterval(momentTimer);if(idx+1<moments.length)viewMoment(idx+1);else closeMomentViewer();}
+  },100);
+}
+function closeMomentViewer(){document.getElementById('moment-viewer').classList.remove('show');if(momentTimer)clearInterval(momentTimer);}
+function openMomentCreator(){if(!CU){showLogin();return;}document.getElementById('moment-creator').classList.add('show');}
+function closeMomentCreator(){document.getElementById('moment-creator').classList.remove('show');}
+function selMomentEmoji(el,em){document.querySelectorAll('.mc-emoji').forEach(e=>e.classList.remove('on'));el.classList.add('on');momentEmoji=em;}
+function selMomentColor(el,c){document.querySelectorAll('.mc-color').forEach(e=>e.classList.remove('sel'));el.classList.add('sel');momentColor=c;}
+async function publishMoment(){
+  const text=document.getElementById('mc-text').value.trim();
+  if(!CU){toast('Connecte-toi d\'abord.');return;}
+  const {error}=await sb.from('moments').insert({user_id:CU.id,emoji:momentEmoji,text,bg_color:momentColor});
+  if(error){toast('Erreur lors de la publication.');return;}
+  closeMomentCreator();toast('Moment publié ✨');loadMoments();
+}
+
+// ── NAVIGATION ────────────────────────────────────────
+function go(page, el){
+  const pt=PAGE_TIERS[page];
+  if(pt && CU && !hasAccess(pt)){
+    const msgs={messages:'La messagerie privée est réservée aux membres Élite (€7/mois)',network:'Le réseau professionnel est réservé aux membres Élite (€7/mois)'};
+    toast(msgs[page]||'Fonctionnalité réservée aux membres premium 🔒');
+    return;
+  }
+  document.querySelectorAll('.page').forEach(p=>{p.classList.remove('on');p.style.display='none';});
+  document.querySelectorAll('.nb,.bn').forEach(b=>b.classList.remove('on'));
+  const pg=document.getElementById('pg-'+page);
+  if(pg){pg.style.display=page==='messages'?'flex':'block';pg.classList.add('on');}
+  if(el) el.classList.add('on');
+  const m=document.getElementById('main');if(m)m.scrollTop=0;
+}
+function showPrivacy(){document.getElementById('landing').classList.remove('show');document.getElementById('login-screen').classList.remove('show');document.getElementById('app').classList.add('on');go('privacy');}
+function showCGU(){document.getElementById('landing').classList.remove('show');document.getElementById('login-screen').classList.remove('show');document.getElementById('app').classList.add('on');go('cgu');}
+
+// ── ONBOARDING ────────────────────────────────────────
+function selOb(el,type){el.parentElement.querySelectorAll('.ob-opt').forEach(o=>o.classList.remove('on'));el.classList.add('on');if(type==='origin')obOrigin=el.textContent;}
+function obStep(step){document.querySelectorAll('#ob1,#ob2,#ob3,#ob4,#ob5').forEach(s=>s.style.display='none');document.getElementById('ob'+step).style.display='block';for(let i=1;i<=5;i++)document.getElementById('obd'+i).classList.toggle('on',i<=step);}
+function hideOnboarding(){
+  document.getElementById('onboarding').classList.remove('show');
+  if(obOrigin&&CU)sb.from('profiles').update({origin:obOrigin}).eq('id',CU.id).then(()=>{if(CP)CP.origin=obOrigin;});
+  toast('Bienvenue sur KINOI.S 🇨🇩');
+}
+
+// ── PWA INSTALL ────────────────────────────────────────
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e;document.getElementById('install-banner').classList.add('show');});
+async function installApp(){
+  if(!installPrompt)return;
+  const res=await installPrompt.prompt();
+  installPrompt=null;
+  document.getElementById('install-banner').classList.remove('show');
+  toast('KINOI.S installé sur ton écran ! 🚀');
+}
+
+// ── COOKIES ───────────────────────────────────────────
+function acceptCookie(){localStorage.setItem('kinois-cookies','1');document.getElementById('cookie-bar').classList.remove('show');}
+function dismissCookie(){document.getElementById('cookie-bar').classList.remove('show');}
+
+// ── TOAST ─────────────────────────────────────────────
+function toast(msg){document.getElementById('tmsg').textContent=msg;const t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200);}
+
+// ── PADDLE ────────────────────────────────────────────
+function openPaddleCheckout(tier){
+  const pid=tier==='makambu'?P_MAKAMBU:P_ELITE;
+  const email=CU?CU.email:'';
+  window.open(`https://buy.paddle.com/product/${pid}${email?'?prefill_email='+encodeURIComponent(email):''}','_blank');
+}
+function manageSub(){hideMyProfile();setTimeout(()=>window.open('https://www.paddle.com/account','_blank'),600);}
+
+// ── INIT ─────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',async()=>{
+  // Init lingala
+  setLingala();
+  // Init pages
+  document.querySelectorAll('.page').forEach(p=>{p.style.display='none';p.classList.remove('on');});
+  const f=document.getElementById('pg-feed');if(f){f.style.display='block';f.classList.add('on');}
+  // Load exchange rate
+  loadExchangeRate();
+  setInterval(loadExchangeRate, 5*60*1000); // refresh every 5 min
+  // Check existing session
+  const {data:{session}}=await sb.auth.getSession();
+  if(session){CU=session.user;await onLogin(false);document.getElementById('landing').classList.remove('show');}
+  // Render events for landing
+  renderEvents('all');
+});
+
+// PWA Service Worker
+if('serviceWorker' in navigator){
+  const sw=`const C='kinois-v2';self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>c.addAll(['/']))));self.addEventListener('fetch',e=>{if(e.request.url.includes('supabase')||e.request.url.includes('paddle'))return;e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>caches.match('/'))))});`;
+  const blob=new Blob([sw],{type:'application/javascript'});
+  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
+}
+</script>
 </body>
 </html>
