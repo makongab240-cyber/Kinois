@@ -17,24 +17,24 @@ body{
   position:relative;
 }
 
-/* ✨ SUBTLE GOLD PARTICLE FIELDS (REAL ANIMATION) */
+/* ✨ very subtle golden tech sparkles */
 body::before{
   content:"";
   position:absolute;
   width:100%;
   height:100%;
   background-image:
-    radial-gradient(circle, rgba(255,215,0,0.25) 1px, transparent 1px),
-    radial-gradient(circle, rgba(196,154,60,0.18) 1px, transparent 1px);
-  background-size:120px 120px, 180px 180px;
-  animation:floatStars 18s linear infinite;
+    radial-gradient(circle, rgba(255,215,0,0.12) 1px, transparent 1px),
+    radial-gradient(circle, rgba(196,154,60,0.08) 1px, transparent 1px);
+  background-size:140px 140px, 220px 220px;
   opacity:0.25;
+  animation:slowFloat 25s linear infinite;
   pointer-events:none;
 }
 
-@keyframes floatStars{
-  0%{transform:translateY(0px);}
-  100%{transform:translateY(-80px);}
+@keyframes slowFloat{
+  0%{transform:translateY(0);}
+  100%{transform:translateY(-60px);}
 }
 
 /* vignette */
@@ -62,7 +62,7 @@ body::before{
   background-clip:text;
 }
 
-/* 🇨🇩 FLAG WITH REAL LIGHT SWEEP (VISIBLE MOTION) */
+/* 🇨🇩 FLAG BAR (NOW FIXED + SUBTLE MOVEMENT ONLY IN HIGHLIGHT) */
 .flag{
   width:380px;
   height:6px;
@@ -80,25 +80,24 @@ body::before{
   );
 }
 
-/* moving highlight */
+/* moving light reflection (SUBTLE ONLY) */
 .flag::after{
   content:"";
   position:absolute;
   top:0;
   left:-50%;
-  width:50%;
+  width:40%;
   height:100%;
   background:linear-gradient(
     90deg,
     transparent,
-    rgba(255,255,255,0.45),
+    rgba(255,255,255,0.35),
     transparent
   );
-  transform:skewX(-20deg);
-  animation:flagSweep 3.8s ease-in-out infinite;
+  animation:shine 5s ease-in-out infinite;
 }
 
-@keyframes flagSweep{
+@keyframes shine{
   0%{left:-60%;}
   100%{left:130%;}
 }
@@ -203,8 +202,9 @@ p{
   </div>
 
   <p>
-    <strong>KINOI.S</strong> — L’infrastructure digitale de la diaspora congolaise où les talents, les projets et les opportunités se rencontrent.<br><br>
-    <strong>EN</strong> — The digital infrastructure of the Congolese diaspora where talent and opportunity converge.
+    <strong>KINOI.S</strong> — L’infrastructure digitale de la diaspora congolaise où les talents, les projets et les opportunités se rencontrent et évoluent ensemble.<br><br>
+
+    <strong>EN</strong> — The digital infrastructure of the Congolese diaspora where talent and opportunity converge into one ecosystem.
   </p>
 
   <div class="lingala">BISO NA BISO</div>
