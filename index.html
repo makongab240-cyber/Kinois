@@ -3,16 +3,72 @@
 <head>
 <meta charset="UTF-8"/>
 <style>
-body{background:#07090D;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;font-family:sans-serif}
-.box{text-align:center;color:#EDE8DC}
-.logo{font-size:2rem;letter-spacing:0.5em;color:#C49A3C;margin-bottom:1rem}
-p{color:rgba(237,232,220,0.5);font-size:0.8rem;letter-spacing:0.2em}
+body{
+  background:#07090D;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:100vh;
+  margin:0;
+  font-family:sans-serif;
+  overflow:hidden;
+}
+
+/* Fade-in effect */
+.box{
+  text-align:center;
+  color:#EDE8DC;
+  opacity:0;
+  transform:translateY(10px);
+  animation:fadeIn 1.5s ease forwards;
+}
+
+@keyframes fadeIn{
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+.logo{
+  font-size:2rem;
+  letter-spacing:0.5em;
+  color:#C49A3C;
+  margin-bottom:1.5rem;
+}
+
+/* Congo flag line */
+.flag-line{
+  width:180px;
+  height:3px;
+  margin:0 auto 1.5rem auto;
+  background:linear-gradient(
+    90deg,
+    #00A3E0 0%,
+    #00A3E0 30%,
+    #FFD100 45%,
+    #CE1126 50%,
+    #FFD100 55%,
+    #00A3E0 70%,
+    #00A3E0 100%
+  );
+  border-radius:2px;
+  box-shadow:0 0 8px rgba(255,209,0,0.4),
+             0 0 12px rgba(206,17,38,0.3);
+}
+
+p{
+  color:rgba(237,232,220,0.5);
+  font-size:0.8rem;
+  letter-spacing:0.2em;
+}
 </style>
 </head>
 <body>
 <div class="box">
-<div class="logo">KINOI.S</div>
-<p>MAINTENANCE EN COURS — BIENTÔT DE RETOUR</p>
+  <div class="logo">KINOI.S</div>
+  <div class="flag-line"></div>
+  <p>LANCEMENT BIENTÔT — LE PREMIER HUB DIGITAL DE LA DIASPORA CONGOLAISE</p>
 </div>
 </body>
 </html>
